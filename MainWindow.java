@@ -7,6 +7,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -193,11 +194,12 @@ public class MainWindow extends JPanel implements ActionListener {
 	@SuppressWarnings("resource")
 	public void getData(String filename) {
 		
-		File f = new File("res/files/" + filename + ".xlsx");
+		File f = new File("files/" + filename + ".xlsx");
+
 		
 		try {
-			
 			FileInputStream fis = new FileInputStream(f);
+
 			XSSFWorkbook workbook = new XSSFWorkbook(fis);
 			
 			XSSFSheet sheet = workbook.getSheetAt(0);
@@ -228,9 +230,25 @@ public class MainWindow extends JPanel implements ActionListener {
 				addEntry(entry);
 			}
 		} catch (FileNotFoundException e) {
+			XSSFWorkbook workbook = new XSSFWorkbook();
+			XSSFSheet sheet = workbook.createSheet(filename);
 
-			System.out.println("File Not Found");
+			try {
+				FileOutputStream out = new FileOutputStream(new File("files/"+ filename +".xls"));
+				workbook.write(out);
+				out.close();
+				System.out.println("Excel written successfully..");
+				
+			} catch (FileNotFoundException ee) {
+				e.printStackTrace();
+			
+			} catch (IOException ee) {
+				e.printStackTrace();
+			}
+
+			System.out.println("File not found. Created new sheet.");
 			e.printStackTrace();
+			
 		} catch (IOException e) {
 
 			System.out.println("Input/Output Error");
