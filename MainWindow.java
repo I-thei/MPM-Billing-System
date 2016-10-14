@@ -5,7 +5,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -20,9 +25,18 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableModel;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 @SuppressWarnings("serial")
 public class MainWindow extends JPanel implements ActionListener {
 
+	int elec1 = 0;
+	int elec2 = 0;
+	int elec3 = 0;
+	int water;
 	int tempid = 1;
 	int compWidth = 120;
 	int compHeight = 25;
@@ -30,9 +44,6 @@ public class MainWindow extends JPanel implements ActionListener {
 	int padding = 25;
 	final int WIDTH = 800;
 	final int HEIGHT = 600;
-	static int elec1;
-	static int elec2;
-	static int elec3;
 
 	JButton add, settings;
 
@@ -78,9 +89,7 @@ public class MainWindow extends JPanel implements ActionListener {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public MainWindow() {
-
-		String[] sample = { Integer.toString(tempid), "Lalala", "Lululu", "Lelele" };
-
+		
 		model.setColumnIdentifiers(columnNames);
 
 		this.setLayout(null);
@@ -113,8 +122,8 @@ public class MainWindow extends JPanel implements ActionListener {
 
 		searchfield = new JTextField("", 255);
 		searchfield.setBounds(padding, padding, WIDTH - padding * 2, compHeight);
+		searchfield.addActionListener(this);
 
-		addEntry(sample);
 		list = new JTable() {
 
 			public boolean isCellEditable(int row, int column) {
@@ -140,6 +149,9 @@ public class MainWindow extends JPanel implements ActionListener {
 		MatteBorder b = new MatteBorder(1, 1, 1, 1, Color.BLACK);
 		list.setBorder(b);
 
+		getData("Stores");
+		
+
 		tablesp = new JScrollPane(list);
 		tablesp.setBounds(padding, padding + compPadding + compHeight, WIDTH - padding * 2 - compWidth - compPadding,
 				HEIGHT - padding * 3 - compPadding * 2 - compHeight);
@@ -159,8 +171,11 @@ public class MainWindow extends JPanel implements ActionListener {
 
 			new AddStoreWindow(this, tempid);
 		} else if (e.getActionCommand().equalsIgnoreCase("Settings")) {
-			
+
 			new SettingsWindow(this);
+		} else if (e.getSource().getClass().toString().equals("class javax.swing.JTextField")) {
+
+			// Do search query
 		}
 	}
 
@@ -175,6 +190,54 @@ public class MainWindow extends JPanel implements ActionListener {
 		return newData;
 	}
 
+	@SuppressWarnings("resource")
+	public void getData(String filename) {
+		
+		File f = new File("res/files/" + filename + ".xlsx");
+		
+		try {
+			
+			FileInputStream fis = new FileInputStream(f);
+			XSSFWorkbook workbook = new XSSFWorkbook(fis);
+			
+			XSSFSheet sheet = workbook.getSheetAt(0);
+			
+			Iterator<Row> rowIterator = sheet.iterator();
+			
+			rowIterator.next();
+			
+			while(rowIterator.hasNext()) {
+				
+				Row row = rowIterator.next();
+				
+				Iterator<Cell> cellIterator = row.cellIterator();
+				
+				String[] entry = new String[4];
+				
+				int i = 0;
+				
+				while(cellIterator.hasNext()) {
+					
+					Cell cell = cellIterator.next();
+					
+					entry[i] = cell.toString();
+					
+					i++;
+				}
+				
+				addEntry(entry);
+			}
+		} catch (FileNotFoundException e) {
+
+			System.out.println("File Not Found");
+			e.printStackTrace();
+		} catch (IOException e) {
+
+			System.out.println("Input/Output Error");
+			e.printStackTrace();
+		}
+	}
+	
 	public void addEntry(String[] entry) {
 
 		data.add(entry);
@@ -185,5 +248,12 @@ public class MainWindow extends JPanel implements ActionListener {
 	public void createBillWindow(int row) {
 
 		new StoreBillWindow(this, data.get(row));
+	}
+
+	public void setSettings(int e1, int e2, int e3) {
+
+		elec1 = e1;
+		elec2 = e2;
+		elec3 = e3;
 	}
 }
