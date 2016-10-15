@@ -14,16 +14,16 @@ public class SettingsWindow extends JPanel implements ActionListener {
 	int padding = 25;
 	int compPadding = 10;
 	int compHeight = 25;
-	int compWidth = 100;
+	int compWidth = 200;
 	int buttonWidth = 80;
-	final int WIDTH = 450;
-	final int HEIGHT = 260;
+	final int WIDTH = 760;
+	final int HEIGHT = 300;
 
 	JFrame f;
 
-	JLabel elec, water, elec1, elec2, elec3, waterl;
+	JLabel elec, water, elec1, water1, water2, water3, water4;
 
-	JTextField elec1t, elec2t, elec3t, watert;
+	JTextField elec1t, elec2t, elec3t, watert1, watert2, watert3, watert4;
 
 	JButton set, cancel;
 
@@ -51,49 +51,58 @@ public class SettingsWindow extends JPanel implements ActionListener {
 		elec = new JLabel("Electrcity");
 		elec.setBounds(padding, padding, compWidth, compHeight);
 
-		elec1 = new JLabel("Range 1");
+		elec1 = new JLabel("kwh:");
 		elec1.setBounds(padding, padding + compHeight + compPadding, compWidth, compHeight);
-
-		elec2 = new JLabel("Range 2");
-		elec2.setBounds(padding, padding + compHeight * 2 + compPadding * 2, compWidth, compHeight);
-
-		elec3 = new JLabel("Range 3");
-		elec3.setBounds(padding, padding + compHeight * 3 + compPadding * 3, compWidth, compHeight);
 
 		water = new JLabel("Water");
 		water.setBounds(WIDTH / 2, padding, compWidth, compHeight);
 
-		elec1t = new JTextField(Integer.toString(mw.elec1), 3);
+		elec1t = new JTextField(Double.toString(mw.elec1), 3);
 		elec1t.setBounds(padding + compPadding + compWidth, padding + compHeight + compPadding, compWidth / 2,
 				compHeight);
 
-		elec2t = new JTextField(Integer.toString(mw.elec2), 3);
-		elec2t.setBounds(padding + compPadding + compWidth, padding + compHeight * 2 + compPadding * 2, compWidth / 2,
+		water1 = new JLabel("First 10 Cubic/m");
+		water1.setBounds(WIDTH / 2, padding + compHeight + compPadding, compWidth, compHeight);
+
+		water2 = new JLabel("Remaining Cubic/m");
+		water2.setBounds(WIDTH / 2, padding + compHeight * 2 + compPadding * 2, compWidth, compHeight);
+
+		water3 = new JLabel("Environmental Charge %");
+		water3.setBounds(WIDTH / 2, padding + compHeight * 3 + compPadding * 3, compWidth, compHeight);
+
+		water4 = new JLabel("E-VAT");
+		water4.setBounds(WIDTH / 2, padding + compHeight * 4 + compPadding * 4, compWidth, compHeight);
+
+		watert1 = new JTextField(Double.toString(mw.water1), 3);
+		watert1.setBounds(WIDTH / 2 + compWidth + compPadding, padding + compHeight + compPadding, compWidth / 2,
 				compHeight);
 
-		elec3t = new JTextField(Integer.toString(mw.elec3), 3);
-		elec3t.setBounds(padding + compPadding + compWidth, padding + compHeight * 3 + compPadding * 3, compWidth / 2,
-				compHeight);
-		
-		waterl = new JLabel("Per Cubic Meter");
-		waterl.setBounds(WIDTH/2, padding + compHeight + compPadding, compWidth, compHeight);
+		watert2 = new JTextField(Double.toString(mw.water2), 3);
+		watert2.setBounds(WIDTH / 2 + compWidth + compPadding, padding + compHeight * 2 + compPadding * 2,
+				compWidth / 2, compHeight);
 
-		watert = new JTextField(Integer.toString(mw.water), 3);
-		watert.setBounds(WIDTH / 2 + compWidth + compPadding, padding + compHeight + compPadding, compWidth / 2,
-				compHeight);
+		watert3 = new JTextField(Double.toString(mw.water3), 3);
+		watert3.setBounds(WIDTH / 2 + compWidth + compPadding, padding + compHeight * 3 + compPadding * 3,
+				compWidth / 2, compHeight);
+
+		watert4 = new JTextField(Double.toString(mw.water4), 3);
+		watert4.setBounds(WIDTH / 2 + compWidth + compPadding, padding + compHeight * 4 + compPadding * 4,
+				compWidth / 2, compHeight);
 
 		add(set);
 		add(cancel);
 		add(elec);
 		add(elec1);
-		add(elec2);
-		add(elec3);
 		add(elec1t);
-		add(elec2t);
-		add(elec3t);
 		add(water);
-		add(waterl);
-		add(watert);
+		add(water1);
+		add(water2);
+		add(water3);
+		add(water4);
+		add(watert1);
+		add(watert2);
+		add(watert3);
+		add(watert4);
 
 		f.setResizable(false);
 		f.add(this);
@@ -107,8 +116,9 @@ public class SettingsWindow extends JPanel implements ActionListener {
 
 			try {
 
-				mw.setSettings(Integer.parseInt(elec1t.getText()), Integer.parseInt(elec2t.getText()),
-						Integer.parseInt(elec3t.getText()));
+				mw.setSettings(Double.parseDouble(elec1t.getText()), Double.parseDouble(watert1.getText()),
+						Double.parseDouble(watert2.getText()), Double.parseDouble(watert3.getText()),
+						Double.parseDouble(watert4.getText()));
 				f.dispose();
 			} catch (Exception e) {
 

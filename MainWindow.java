@@ -7,8 +7,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,10 +34,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 @SuppressWarnings("serial")
 public class MainWindow extends JPanel implements ActionListener {
 
-	int elec1 = 0;
-	int elec2 = 0;
-	int elec3 = 0;
-	int water;
 	int tempid = 1;
 	int compWidth = 120;
 	int compHeight = 25;
@@ -45,7 +41,13 @@ public class MainWindow extends JPanel implements ActionListener {
 	int padding = 25;
 	final int WIDTH = 800;
 	final int HEIGHT = 600;
-
+	
+	double elec1 = 8.50;
+	double water1 = 314.33;
+	double water2 = 31.47;
+	double water3 = 12;
+	double water4 = 12;
+	
 	JButton add, settings;
 
 	@SuppressWarnings("rawtypes")
@@ -61,12 +63,17 @@ public class MainWindow extends JPanel implements ActionListener {
 
 	public static String[] sectionList = { "ALL SECTIONS", "1ST FLOOR", "2ND FLOOR", "MEAT", "FOOD", "CHICKEN", "FISH",
 			"VEGETABLE", "FRUIT", "GROCERY", "SPECIAL", "MOBILE" };
-	String[] columnNames = { "Store Number", "Store Name", "Store Section", "Store Owner" };
+	String[] columnNames = { "Store ID", "Store Section", "Store Name", "Store Owner" };
 
 	ArrayList<String[]> data = new ArrayList<>();
 
 	DefaultTableModel model = new DefaultTableModel();
 
+	File f, f2;
+	FileInputStream fis, fis2;
+	XSSFWorkbook workbook, workbook2;	
+	XSSFSheet sheet, sheet2;
+	
 	public static void main(String[] args) {
 
 		try {
@@ -90,6 +97,81 @@ public class MainWindow extends JPanel implements ActionListener {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public MainWindow() {
+		f = new File("res/files/Stores.xlsx");
+		
+		try {
+			fis = new FileInputStream(f);
+			workbook = new XSSFWorkbook(fis);
+			sheet = workbook.getSheetAt(0);
+		} catch (IOException e) {
+			
+			workbook = new XSSFWorkbook();
+			sheet = workbook.createSheet("Stores");
+
+			Row dataRow = sheet.createRow(0);
+			dataRow.createCell(0).setCellValue(columnNames[0]);
+			dataRow.createCell(1).setCellValue(columnNames[1]);
+			dataRow.createCell(2).setCellValue(columnNames[2]);
+			dataRow.createCell(3).setCellValue(columnNames[3]);
+
+			try {
+				FileOutputStream out = new FileOutputStream(new File("res/files/Stores.xlsx"));
+				workbook.write(out);
+				out.close();
+				System.out.println("Excel written successfully..");
+				
+			} catch (FileNotFoundException ee) {
+				e.printStackTrace();
+			
+			} catch (IOException ee) {
+				e.printStackTrace();
+			}
+
+			System.out.println("File not found. Created new sheet.");
+			e.printStackTrace();
+		}
+
+		f2= new File("res/files/Bills.xlsx");
+		
+		try {
+			fis2 = new FileInputStream(f2);
+			workbook2 = new XSSFWorkbook(fis2);
+			sheet2 = workbook2.getSheetAt(0);
+
+		} catch (IOException e) {
+			
+			workbook2 = new XSSFWorkbook();
+			sheet2 = workbook2.createSheet("Bills");
+
+
+			Row dataRow = sheet2.createRow(0);
+			
+
+			dataRow.createCell(0).setCellValue("id");
+			dataRow.createCell(1).setCellValue("stall_id");
+			dataRow.createCell(2).setCellValue("kwh");
+			dataRow.createCell(3).setCellValue("cubic/m");
+			dataRow.createCell(4).setCellValue("e_amount");
+			dataRow.createCell(5).setCellValue("w_amount");
+			dataRow.createCell(6).setCellValue("date");
+
+			try {
+				FileOutputStream out = new FileOutputStream(new File("res/files/Bills.xlsx"));
+				workbook2.write(out);
+				out.close();
+				System.out.println("Excel written successfully..");
+				
+			} catch (FileNotFoundException ee) {
+				e.printStackTrace();
+			
+			} catch (IOException ee) {
+				e.printStackTrace();
+			}
+
+			System.out.println("File not found. Created new sheet.");
+			e.printStackTrace();
+		}
+		
 		
 		model.setColumnIdentifiers(columnNames);
 
@@ -150,9 +232,8 @@ public class MainWindow extends JPanel implements ActionListener {
 		MatteBorder b = new MatteBorder(1, 1, 1, 1, Color.BLACK);
 		list.setBorder(b);
 
-		getData("Stores");
+		getData();
 		
-
 		tablesp = new JScrollPane(list);
 		tablesp.setBounds(padding, padding + compPadding + compHeight, WIDTH - padding * 2 - compWidth - compPadding,
 				HEIGHT - padding * 3 - compPadding * 2 - compHeight);
@@ -191,92 +272,63 @@ public class MainWindow extends JPanel implements ActionListener {
 		return newData;
 	}
 
-	@SuppressWarnings("resource")
-	public void getData(String filename) {
+	public void getData() {
 		
-		File f = new File("files/" + filename + ".xlsx");
-
+		Iterator<Row> rowIterator = sheet.iterator();
 		
-		try {
-			FileInputStream fis = new FileInputStream(f);
-
-			XSSFWorkbook workbook = new XSSFWorkbook(fis);
+		rowIterator.next();
+		
+		while(rowIterator.hasNext()) {
 			
-			XSSFSheet sheet = workbook.getSheetAt(0);
+			Row row = rowIterator.next();
 			
-			Iterator<Row> rowIterator = sheet.iterator();
+			Iterator<Cell> cellIterator = row.cellIterator();
 			
-			rowIterator.next();
+			String[] entry = new String[4];
 			
-			while(rowIterator.hasNext()) {
-				
-				Row row = rowIterator.next();
-				
-				Iterator<Cell> cellIterator = row.cellIterator();
-				
-				String[] entry = new String[4];
-				
-				int i = 0;
-				
-				while(cellIterator.hasNext()) {
-					
-					Cell cell = cellIterator.next();
-					
-					entry[i] = cell.toString();
-					
-					i++;
-				}
-				
-				addEntry(entry);
-			}
-		} catch (FileNotFoundException e) {
-			XSSFWorkbook workbook = new XSSFWorkbook();
-			XSSFSheet sheet = workbook.createSheet(filename);
-
-			try {
-				FileOutputStream out = new FileOutputStream(new File("files/"+ filename +".xls"));
-				workbook.write(out);
-				out.close();
-				System.out.println("Excel written successfully..");
-				
-			} catch (FileNotFoundException ee) {
-				e.printStackTrace();
+			int i = 0;
 			
-			} catch (IOException ee) {
-				e.printStackTrace();
+			while(cellIterator.hasNext()) {
+				
+				Cell cell = cellIterator.next();
+				
+				System.out.println(cell.getRowIndex() + ":" + cell.getColumnIndex());
+				
+				entry[i] = cell.toString();
+				
+				i++;
 			}
 
-			System.out.println("File not found. Created new sheet.");
-			e.printStackTrace();
-			
-		} catch (IOException e) {
-
-			System.out.println("Input/Output Error");
-			e.printStackTrace();
+			addEntry(entry);
 		}
 	}
 	
+	@SuppressWarnings({ "resource", "unused" })
 	public void addEntry(String[] entry) {
-		int x = data.size();
+
+		data.add(entry);
+		model.addRow(entry);
+		tempid++;
+
+	 	int x = data.size();
+		System.out.println(x);
+		File f = new File("res/files/Stores.xlsx");
 
 		try {
-			FileInputStream file = new FileInputStream(new File("C:\\update.xls"));
-
-			HSSFWorkbook workbook = new HSSFWorkbook(file);
-			HSSFSheet sheet = workbook.getSheetAt(0);
+			FileInputStream fis = new FileInputStream(f);
+			XSSFWorkbook workbook = new XSSFWorkbook(fis);
+			XSSFSheet sheet = workbook.getSheetAt(0);
 			Cell cell = null;
 
-			//Update the value of cell
-			cell = sheet.getRow(1).getCell(2);
-			cell.setCellValue(cell.getNumericCellValue() * 2);
-			cell = sheet.getRow(2).getCell(2);
-			cell.setCellValue(cell.getNumericCellValue() * 2);
-			cell = sheet.getRow(3).getCell(2);
-			cell.setCellValue(cell.getNumericCellValue() * 2);
+			Row dataRow = sheet.createRow(x);
+			dataRow.createCell(0).setCellValue(entry[0]);
+			dataRow.createCell(1).setCellValue(entry[1]);
+			dataRow.createCell(2).setCellValue(entry[2]);
+			dataRow.createCell(3).setCellValue(entry[3]);
+
+			fis.close();
 			
-			file.close();
-			
-			FileOutputStream outFile =new FileOutputStream(new File("C:\\update.xls"));
+			FileOutputStream outFile = new FileOutputStream(f);
 			workbook.write(outFile);
 			outFile.close();
 			
@@ -285,11 +337,6 @@ public class MainWindow extends JPanel implements ActionListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-
-		data.add(entry);
-		model.addRow(entry);
-		tempid++;
 	}
 
 	public void createBillWindow(int row) {
@@ -297,10 +344,12 @@ public class MainWindow extends JPanel implements ActionListener {
 		new StoreBillWindow(this, data.get(row));
 	}
 
-	public void setSettings(int e1, int e2, int e3) {
+	public void setSettings(double e1, double w1, double w2, double w3, double w4) {
 
 		elec1 = e1;
-		elec2 = e2;
-		elec3 = e3;
+		water1 = w1;
+		water2 = w2;
+		water3 = w3;
+		water4 = w4;
 	}
 }
