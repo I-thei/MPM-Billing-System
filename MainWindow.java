@@ -69,10 +69,10 @@ public class MainWindow extends JPanel implements ActionListener {
 
 	DefaultTableModel model = new DefaultTableModel();
 
-	File f, f2;
-	FileInputStream fis, fis2;
-	XSSFWorkbook workbook, workbook2;	
-	XSSFSheet sheet, sheet2;
+	File f, f2, f3;
+	FileInputStream fis, fis2, fis3;
+	XSSFWorkbook workbook, workbook2, workbook3;	
+	XSSFSheet sheet, sheet2, sheet3;
 	
 	public static void main(String[] args) {
 
@@ -131,7 +131,7 @@ public class MainWindow extends JPanel implements ActionListener {
 			e.printStackTrace();
 		}
 
-		f2= new File("res/files/Bills.xlsx");
+		f2= new File("res/files/Electric Bills.xlsx");
 		
 		try {
 			fis2 = new FileInputStream(f2);
@@ -141,7 +141,7 @@ public class MainWindow extends JPanel implements ActionListener {
 		} catch (IOException e) {
 			
 			workbook2 = new XSSFWorkbook();
-			sheet2 = workbook2.createSheet("Bills");
+			sheet2 = workbook2.createSheet("Electric Bills");
 
 
 			Row dataRow = sheet2.createRow(0);
@@ -149,14 +149,12 @@ public class MainWindow extends JPanel implements ActionListener {
 
 			dataRow.createCell(0).setCellValue("id");
 			dataRow.createCell(1).setCellValue("stall_id");
-			dataRow.createCell(2).setCellValue("kwh");
-			dataRow.createCell(3).setCellValue("cubic/m");
+			dataRow.createCell(2).setCellValue("date");
+			dataRow.createCell(3).setCellValue("kwh");
 			dataRow.createCell(4).setCellValue("e_amount");
-			dataRow.createCell(5).setCellValue("w_amount");
-			dataRow.createCell(6).setCellValue("date");
 
 			try {
-				FileOutputStream out = new FileOutputStream(new File("res/files/Bills.xlsx"));
+				FileOutputStream out = new FileOutputStream(new File("res/files/Electric Bills.xlsx"));
 				workbook2.write(out);
 				out.close();
 				System.out.println("Excel written successfully..");
@@ -171,6 +169,46 @@ public class MainWindow extends JPanel implements ActionListener {
 			System.out.println("File not found. Created new sheet.");
 			e.printStackTrace();
 		}
+
+		f3= new File("res/files/Water Bills.xlsx");
+		
+		try {
+			fis3 = new FileInputStream(f3);
+			workbook3 = new XSSFWorkbook(fis3);
+			sheet3 = workbook3.getSheetAt(0);
+
+		} catch (IOException e) {
+			
+			workbook3 = new XSSFWorkbook();
+			sheet3 = workbook3.createSheet("Water Bills");
+
+
+			Row dataRow = sheet3.createRow(0);
+			
+
+			dataRow.createCell(0).setCellValue("id");
+			dataRow.createCell(1).setCellValue("stall_id");
+			dataRow.createCell(2).setCellValue("date");
+			dataRow.createCell(3).setCellValue("cubic/m");
+			dataRow.createCell(4).setCellValue("w_amount");
+
+			try {
+				FileOutputStream out = new FileOutputStream(new File("res/files/Water Bills.xlsx"));
+				workbook3.write(out);
+				out.close();
+				System.out.println("Excel written successfully..");
+				
+			} catch (FileNotFoundException ee) {
+				e.printStackTrace();
+			
+			} catch (IOException ee) {
+				e.printStackTrace();
+			}
+
+			System.out.println("File not found. Created new sheet.");
+			e.printStackTrace();
+		}
+		
 		
 		
 		model.setColumnIdentifiers(columnNames);
