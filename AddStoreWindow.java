@@ -77,12 +77,12 @@ public class AddStoreWindow extends JPanel implements ActionListener {
 		sectionsircb.setBounds(padding + compWidth + compPadding, padding + compPadding + compHeight, compWidth + 40,
 				compHeight);
 
-		holdertf = new JTextField(25);
-		holdertf.setBounds(padding + compWidth + compPadding, padding + compPadding * 2 + compHeight * 2,
+		nametf = new JTextField(25);
+		nametf.setBounds(padding + compWidth + compPadding, padding + compPadding * 2 + compHeight * 2,
 				compWidth + 40, compHeight);
 
-		nametf = new JTextField(25);
-		nametf.setBounds(padding + compWidth + compPadding, padding + compPadding * 3 + compHeight * 3, compWidth + 40,
+		holdertf = new JTextField(25);
+		holdertf.setBounds(padding + compWidth + compPadding, padding + compPadding * 3 + compHeight * 3, compWidth + 40,
 				compHeight);
 
 		add(add);
@@ -106,7 +106,7 @@ public class AddStoreWindow extends JPanel implements ActionListener {
 			f.dispose();
 		} else if (ae.getActionCommand().equalsIgnoreCase("Add")) {
 
-			String[] entry = { Integer.toString(store_id), nametf.getText(), sectionsircb.getSelectedItem().toString(),
+			String[] entry = { Integer.toString(store_id), sectionsircb.getSelectedItem().toString(), nametf.getText(),
 					holdertf.getText() };
 			mw.addEntry(entry);
 			f.dispose();

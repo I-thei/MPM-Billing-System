@@ -63,16 +63,16 @@ public class MainWindow extends JPanel implements ActionListener {
 
 	public static String[] sectionList = { "ALL SECTIONS", "1ST FLOOR", "2ND FLOOR", "MEAT", "FOOD", "CHICKEN", "FISH",
 			"VEGETABLE", "FRUIT", "GROCERY", "SPECIAL", "MOBILE" };
-	String[] columnNames = { "Store Number", "Store Name", "Store Section", "Store Owner" };
+	String[] columnNames = { "Store ID", "Store Section", "Store Name", "Store Owner" };
 
 	ArrayList<String[]> data = new ArrayList<>();
 
 	DefaultTableModel model = new DefaultTableModel();
 
-	File f;
-	FileInputStream fis;
-	XSSFWorkbook workbook;	
-	XSSFSheet sheet;
+	File f, f2;
+	FileInputStream fis, fis2;
+	XSSFWorkbook workbook, workbook2;	
+	XSSFSheet sheet, sheet2;
 	
 	public static void main(String[] args) {
 
@@ -97,11 +97,9 @@ public class MainWindow extends JPanel implements ActionListener {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public MainWindow() {
-		
 		f = new File("res/files/Stores.xlsx");
 		
 		try {
-			
 			fis = new FileInputStream(f);
 			workbook = new XSSFWorkbook(fis);
 			sheet = workbook.getSheetAt(0);
@@ -110,8 +108,14 @@ public class MainWindow extends JPanel implements ActionListener {
 			workbook = new XSSFWorkbook();
 			sheet = workbook.createSheet("Stores");
 
+			Row dataRow = sheet.createRow(0);
+			dataRow.createCell(0).setCellValue(columnNames[0]);
+			dataRow.createCell(1).setCellValue(columnNames[1]);
+			dataRow.createCell(2).setCellValue(columnNames[2]);
+			dataRow.createCell(3).setCellValue(columnNames[3]);
+
 			try {
-				FileOutputStream out = new FileOutputStream(new File("files/Stores.xls"));
+				FileOutputStream out = new FileOutputStream(new File("res/files/Stores.xlsx"));
 				workbook.write(out);
 				out.close();
 				System.out.println("Excel written successfully..");
@@ -126,6 +130,48 @@ public class MainWindow extends JPanel implements ActionListener {
 			System.out.println("File not found. Created new sheet.");
 			e.printStackTrace();
 		}
+
+		f2= new File("res/files/Bills.xlsx");
+		
+		try {
+			fis2 = new FileInputStream(f2);
+			workbook2 = new XSSFWorkbook(fis2);
+			sheet2 = workbook2.getSheetAt(0);
+
+		} catch (IOException e) {
+			
+			workbook2 = new XSSFWorkbook();
+			sheet2 = workbook2.createSheet("Bills");
+
+
+			Row dataRow = sheet2.createRow(0);
+			
+
+			dataRow.createCell(0).setCellValue("id");
+			dataRow.createCell(1).setCellValue("stall_id");
+			dataRow.createCell(2).setCellValue("kwh");
+			dataRow.createCell(3).setCellValue("cubic/m");
+			dataRow.createCell(4).setCellValue("e_amount");
+			dataRow.createCell(5).setCellValue("w_amount");
+			dataRow.createCell(6).setCellValue("date");
+
+			try {
+				FileOutputStream out = new FileOutputStream(new File("res/files/Bills.xlsx"));
+				workbook2.write(out);
+				out.close();
+				System.out.println("Excel written successfully..");
+				
+			} catch (FileNotFoundException ee) {
+				e.printStackTrace();
+			
+			} catch (IOException ee) {
+				e.printStackTrace();
+			}
+
+			System.out.println("File not found. Created new sheet.");
+			e.printStackTrace();
+		}
+		
 		
 		model.setColumnIdentifiers(columnNames);
 
@@ -186,7 +232,7 @@ public class MainWindow extends JPanel implements ActionListener {
 		MatteBorder b = new MatteBorder(1, 1, 1, 1, Color.BLACK);
 		list.setBorder(b);
 
-		getData("Stores");
+		getData();
 		
 		tablesp = new JScrollPane(list);
 		tablesp.setBounds(padding, padding + compPadding + compHeight, WIDTH - padding * 2 - compWidth - compPadding,
@@ -226,7 +272,7 @@ public class MainWindow extends JPanel implements ActionListener {
 		return newData;
 	}
 
-	public void getData(String filename) {
+	public void getData() {
 		
 		Iterator<Row> rowIterator = sheet.iterator();
 		
@@ -246,22 +292,51 @@ public class MainWindow extends JPanel implements ActionListener {
 				
 				Cell cell = cellIterator.next();
 				
+				System.out.println(cell.getRowIndex() + ":" + cell.getColumnIndex());
+				
 				entry[i] = cell.toString();
 				
 				i++;
 			}
-			
+
 			addEntry(entry);
 		}
 	}
 	
+	@SuppressWarnings({ "resource", "unused" })
 	public void addEntry(String[] entry) {
 
 		data.add(entry);
 		model.addRow(entry);
-		
 		tempid++;
-		
+
+	 	int x = data.size();
+		System.out.println(x);
+		File f = new File("res/files/Stores.xlsx");
+
+		try {
+			FileInputStream fis = new FileInputStream(f);
+			XSSFWorkbook workbook = new XSSFWorkbook(fis);
+			XSSFSheet sheet = workbook.getSheetAt(0);
+			Cell cell = null;
+
+			Row dataRow = sheet.createRow(x);
+			dataRow.createCell(0).setCellValue(entry[0]);
+			dataRow.createCell(1).setCellValue(entry[1]);
+			dataRow.createCell(2).setCellValue(entry[2]);
+			dataRow.createCell(3).setCellValue(entry[3]);
+
+			fis.close();
+			
+			FileOutputStream outFile = new FileOutputStream(f);
+			workbook.write(outFile);
+			outFile.close();
+			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void createBillWindow(int row) {

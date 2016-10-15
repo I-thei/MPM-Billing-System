@@ -1,20 +1,25 @@
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.*;
+import javax.swing.table.*;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 @SuppressWarnings({ "serial", "rawtypes" })
 public class StoreBillWindow extends JPanel implements ActionListener {
@@ -29,6 +34,8 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 	int buttonWidth = 200;
 	static final int WIDTH = 780;
 	static final int HEIGHT = 560;
+
+	String id;
 
 	DefaultTableModel e_model = new DefaultTableModel();
 	DefaultTableModel w_model = new DefaultTableModel();
@@ -60,7 +67,7 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 		this.mw = mw;
 
-		String id = data[0];
+		id = data[0];
 		String name = data[1];
 		String section = data[2];
 		String holder = data[3];
@@ -221,10 +228,68 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		case 0:
 			e_data.add(entry);
 			e_model.addRow(entry);
+			int x = e_data.size() + w_data.size();
+			mw.f2 = new File("res/files/Bills.xlsx");
+			
+			try {
+				mw.fis2 = new FileInputStream(mw.f2);
+				mw.workbook2 = new XSSFWorkbook(mw.fis2);
+				mw.sheet2 = mw.workbook2.getSheetAt(0);
+				Cell cell = null;
+
+				Row dataRow = mw.sheet2.createRow(x);
+				dataRow.createCell(0).setCellValue(x);
+				dataRow.createCell(1).setCellValue(id);
+				dataRow.createCell(2).setCellValue(entry[1]);
+				dataRow.createCell(4).setCellValue(entry[2]);
+				dataRow.createCell(6).setCellValue(entry[0]);
+
+				mw.fis2.close();
+				
+				FileOutputStream outFile = new FileOutputStream(mw.f2);
+				mw.workbook2.write(outFile);
+				outFile.close();
+					
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 			break;
+
 		case 1:
 			w_data.add(entry);
 			w_model.addRow(entry);
+			x = e_data.size() + w_data.size();
+			mw.f2 = new File("res/files/Bills.xlsx");
+
+			try {
+
+				mw.fis2 = new FileInputStream(mw.f2);
+				mw.workbook2 = new XSSFWorkbook(mw.fis2);
+				mw.sheet2 = mw.workbook2.getSheetAt(0);
+				Cell cell = null;
+
+				Row dataRow = mw.sheet2.createRow(x);
+				dataRow.createCell(0).setCellValue(x);
+				dataRow.createCell(1).setCellValue(id);
+				dataRow.createCell(3).setCellValue(entry[1]);
+				dataRow.createCell(5).setCellValue(entry[2]);
+				dataRow.createCell(6).setCellValue(entry[0]);
+
+				mw.fis2.close();
+				
+				FileOutputStream outFile = new FileOutputStream(mw.f2);
+				mw.workbook2.write(outFile);
+				outFile.close();
+					
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
 			break;
 		default:
 			System.out.println("Invalid Case");
@@ -232,6 +297,9 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		}
 
 		this.revalidate();
+
+
+
 	}
 
 	public void checkLists() {
@@ -320,5 +388,10 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		revalidate();
 		updateUI();
 		checkLists();
+	}
+	
+	public void getData() {
+	
+		
 	}
 }
