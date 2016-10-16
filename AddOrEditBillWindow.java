@@ -138,13 +138,13 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 			if (isInt) {
 				if (elec) {
 					String[] e_entry = {Integer.toString(sbw.e_id), sbw.store_id, datePicker.getJFormattedTextField().getText(), input.getText(),"RATE/ what to put?", "LOL AMOUNT" };
-					sbw.e_model.add(e_entry);
+					sbw.mw.e_model.add(e_entry);
 					String[] entry = {e_entry[2], e_entry[3], e_entry[5]};
 					sbw.e_tableModel.addRow(entry);
 				} else {
 
 					String[] w_entry = {Integer.toString(sbw.w_id), sbw.store_id, datePicker.getJFormattedTextField().getText(), input.getText(), "RATE/ what to put?", "LOL AMOUNT" };
-					sbw.w_model.add(w_entry);
+					sbw.mw.w_model.add(w_entry);
 					String[] entry = {w_entry[2], w_entry[3], w_entry[5]};
 					sbw.w_tableModel.addRow(entry);
 				}

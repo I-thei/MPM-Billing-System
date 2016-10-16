@@ -38,8 +38,6 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 	int e_id, w_id;
 	String store_id, store_section, store_name, store_holder;
 
-	DataModel e_model, w_model;
-
 	DefaultTableModel e_tableModel = new DefaultTableModel();
 	DefaultTableModel w_tableModel = new DefaultTableModel();
 
@@ -60,9 +58,6 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 	String[] w_columnNames = { "Date", "Cubic Meters", "Amount" };
 	String[] report_types = { "Monthly", "Yearly" };
 
-	ArrayList<String[]> e_data = new ArrayList<>();
-	ArrayList<String[]> w_data = new ArrayList<>();
-
 	MainWindow mw;
 
 	@SuppressWarnings("unchecked")
@@ -70,17 +65,11 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 		this.mw = mw;
 
-		e_model = DataModel.Electric;
-		w_model = DataModel.Water;
-
-		if(e_data.size() > 0) { e_id = Integer.parseInt(e_data.get(e_data.size()-1)[0]) + 1;}
+		if(mw.e_data.size() > 0) { e_id = Integer.parseInt(mw.e_data.get(mw.e_data.size()-1)[0]) + 1;}
 		else e_id = 1;
 
-		if(w_data.size() > 0) { e_id = Integer.parseInt(w_data.get(w_data.size()-1)[0]) + 1;}
+		if(mw.w_data.size() > 0) { w_id = Integer.parseInt(mw.w_data.get(mw.w_data.size()-1)[0]) + 1;}
 		else w_id = 1;
-
-		e_data = mw.e_data;
-		w_data = mw.w_data;
 
 		store_id = store_data[0];
 		store_name = store_data[1];
@@ -208,14 +197,14 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 			add(w_buttons[i]);
 		}
 
-		for (String[] e : e_data){
+		for (String[] e : mw.e_data){
 			if(e[1].equals(store_id)){
 				String[] entry = {e[2], e[3], e[5]};
 				e_tableModel.addRow(entry);
 			}
 		}
 
-		for (String[] w : w_data){
+		for (String[] w : mw.w_data){
 			if(w[1].equals(store_id)){
 				String[] entry = {w[2], w[3], w[5]};
 				w_tableModel.addRow(entry);
@@ -232,7 +221,7 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 	public void checkLists() {
 
-		if (e_data.size() <= 0) {
+		if (mw.e_data.size() <= 0) {
 
 			e_buttons[1].setEnabled(false);
 			e_buttons[2].setEnabled(false);
@@ -242,7 +231,7 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 			e_buttons[2].setEnabled(true);
 		}
 
-		if (w_data.size() <= 0) {
+		if (mw.w_data.size() <= 0) {
 
 			w_buttons[1].setEnabled(false);
 			w_buttons[2].setEnabled(false);
@@ -262,15 +251,15 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 		} else if (e.getActionCommand().equals(" Edit ")) {
 			if (e_row != -1) {
-				new AddOrEditBillWindow(this, true, false, e_data.get(e_row));
+				new AddOrEditBillWindow(this, true, false, mw.e_data.get(e_row));
 			} else {
 				JOptionPane.showMessageDialog(null, "Select a row first.");
 			}
 
 		} else if (e.getActionCommand().equals(" Delete ")) {
 			if (e_row != -1) {
-				e_model.remove((Integer) e_tableModel.getValueAt(e_row, 0));
-				e_data.remove(e_row);
+				mw.e_model.remove((Integer) e_tableModel.getValueAt(e_row, 0));
+				mw.e_data.remove(e_row);
 				e_tableModel.removeRow(e_row);
 			} else {
 				JOptionPane.showMessageDialog(null, "Select a row first.");
@@ -281,15 +270,15 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 		} else if (e.getActionCommand().equals("Edit")) {
 			if (w_row != -1) {
-				new AddOrEditBillWindow(this, false, false, w_data.get(w_row));
+				new AddOrEditBillWindow(this, false, false, mw.w_data.get(w_row));
 			} else {
 				JOptionPane.showMessageDialog(null, "Select a row first.");
 			}
 
 		} else if (e.getActionCommand().equals("Delete")) {
 			if (w_row != -1) {
-				w_model.remove((Integer) w_tableModel.getValueAt(w_row, 0));
-				w_data.remove(w_row);
+				mw.w_model.remove((Integer) w_tableModel.getValueAt(w_row, 0));
+				mw.w_data.remove(w_row);
 				w_tableModel.removeRow(w_row);
 			} else {
 

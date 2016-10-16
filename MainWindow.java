@@ -88,8 +88,8 @@ public class MainWindow extends JPanel implements ActionListener {
 
     e_data = e_model.getAll();
 	w_data = w_model.getAll();
-
     data = model.getAll(); 
+
     if(data.size() > 0) lastId = Integer.parseInt(data.get(data.size()-1)[0]) + 1;
     	tableModel = new DefaultTableModel();
 		tableModel.setColumnIdentifiers(model.getAttributes());
