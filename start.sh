@@ -1,0 +1,1 @@
+javac -cp ".:jdatepicker-1.3.4.jar:c-codec.jar:c-collections.jar:c-loggings.jar:curveapi.jar:JDP.jar:junit.jar:log4j.jar:poi.jar:poi-o.jar:poi-o-s.jar:xmlbeans.jar:" *.java && java -cp ".:jdatepicker-1.3.4.jar:c-codec.jar:c-collections.jar:c-loggings.jar:curveapi.jar:JDP.jar:junit.jar:log4j.jar:poi.jar:poi-o.jar:poi-o-s.jar:xmlbeans.jar" MainWindow
