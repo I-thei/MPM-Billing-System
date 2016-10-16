@@ -51,10 +51,8 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 
 		String title = "";
 		if (add) {
-
 			title = "Add";
 		} else {
-
 			title = "Edit";
 		}
 
@@ -121,41 +119,38 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 		String date = datePicker.getJFormattedTextField().getText();
 		String[] dateComp = date.split("-");
 
-		datePicker.getJFormattedTextField()
-				.setText(months[Integer.parseInt(dateComp[1])] + " " + dateComp[2] + ", " + dateComp[0]);
+		datePicker.getJFormattedTextField().setText(months[Integer.parseInt(dateComp[1])] + " " + dateComp[2] + ", " + dateComp[0]);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 
 		if (ae.getActionCommand().equalsIgnoreCase("Cancel")) {
-
 			f.dispose();
 		} else if (ae.getActionCommand().equalsIgnoreCase("Add") || ae.getActionCommand().equalsIgnoreCase("Edit")) {
-
 			boolean isInt = true;
-
 			try {
-
 				Integer.parseInt(input.getText());
 			} catch (NumberFormatException e) {
-
 				isInt = false;
 			}
 
 			if (isInt) {
-
 				if (elec) {
-
-					String[] entry = { datePicker.getJFormattedTextField().getText(), input.getText(), "LOL AMOUNT" };
-					sbw.addEntry(0, entry);
+					String[] e_entry = {Integer.toString(sbw.e_id), sbw.store_id, datePicker.getJFormattedTextField().getText(), input.getText(),"RATE/ what to put?", "LOL AMOUNT" };
+					sbw.e_model.add(e_entry);
+					String[] entry = {e_entry[2], e_entry[3], e_entry[5]};
+					sbw.e_tableModel.addRow(entry);
 				} else {
 
-					String[] entry = { datePicker.getJFormattedTextField().getText(), input.getText(), "LOL AMOUNT" };
-					sbw.addEntry(1, entry);
+					String[] w_entry = {Integer.toString(sbw.w_id), sbw.store_id, datePicker.getJFormattedTextField().getText(), input.getText(), "RATE/ what to put?", "LOL AMOUNT" };
+					sbw.w_model.add(w_entry);
+					String[] entry = {w_entry[2], w_entry[3], w_entry[5]};
+					sbw.w_tableModel.addRow(entry);
 				}
 
 				sbw.checkLists();
+				sbw.revalidate();
 				f.dispose();
 			} else {
 

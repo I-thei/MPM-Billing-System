@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import org.apache.poi.ss.usermodel.Cell;
@@ -15,7 +17,7 @@ public enum DataModel {
   
   private final static String DIRECTORY = "";
   private final static String FILENAME = "data.xlsx";
-  private static Workbook workbook = null;
+  private static XSSFWorkbook workbook = null;
 
   private final static String ECHARGE = "12";
   private final static String EVAT = "12";
@@ -34,13 +36,15 @@ public enum DataModel {
     String path = DIRECTORY + FILENAME;
 
     try {
-      workbook = new XSSFWorkbook(path);
-
+      FileInputStream in = new FileInputStream(new File(path));
+      workbook = new XSSFWorkbook(in);
+      Sheet  sheet = workbook.getSheetAt(0);
       return true;
+
     } catch (Exception e) {
       try {
-        File file = new File(path);
-        workbook = new XSSFWorkbook(file);
+        workbook = new XSSFWorkbook();
+        System.out.println("Workbook");
         for (DataModel d : DataModel.values()) {
           Sheet sheet = workbook.createSheet(d.name());
 
@@ -61,6 +65,7 @@ public enum DataModel {
             evat.createCell(1).setCellValue(EVAT);
           }
         }
+        _write();
 
         System.out.println("File not found. Created new sheet.");
         e.printStackTrace();
@@ -75,6 +80,19 @@ public enum DataModel {
     }
   }
 
+  public static boolean _write(){
+    try {
+      FileOutputStream out = new FileOutputStream(new File(DIRECTORY+FILENAME));
+      workbook.write(out);
+      out.close();
+    }
+    catch(Exception e){
+        e.printStackTrace();
+        return false;
+    }
+    return true;
+  }
+
   private static boolean _checkInstance() {
     if (workbook == null) return initialize();
     else return true;
@@ -85,7 +103,6 @@ public enum DataModel {
     Sheet sheet = workbook.getSheet(name());
     Iterator<Row> ri = sheet.iterator();
     ri.next();
-
     while (ri.hasNext()) {
       Row row = ri.next();
       Iterator<Cell> ci = row.iterator();
@@ -97,23 +114,22 @@ public enum DataModel {
         _row[i] = cell.toString();
         i++;
       }
-
-      if (_row[0] != "-1") data.add(_row);
+      if(!isRowEmpty(row)) data.add(_row);
     }
-
     return;
   }
 
   public boolean _edit(int id, String[] s) {
     if (_checkInstance()) _getData();
-
     Sheet sheet = workbook.getSheet(name());
-    Row temp = sheet.getRow(id);
+    Row temp = sheet.createRow(id);
     for (int i = 0; i < length; i++) {
+      temp.createCell(i);
       Cell cell = temp.getCell(i);
       if (s.length < length) cell.setCellValue("");
       else cell.setCellValue(s[i]);
     }
+    _write();
     return true;
   }
 
@@ -134,7 +150,6 @@ public enum DataModel {
 
   public boolean remove(int id) {
     if (name() == "Stores" || name() == "Settings") return false;
-    
     int _id = Integer.parseInt(data.remove(id)[0]);
     return _edit(_id, new String[]{"-1"});
   }
@@ -161,4 +176,13 @@ public enum DataModel {
       return false;
     }
   }
+
+  public static boolean isRowEmpty(Row row) {
+    for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
+        Cell cell = row.getCell(c);
+        if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK && !cell.getStringCellValue().equals(""))
+            return false;
+    }
+    return true;
+}
 }

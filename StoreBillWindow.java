@@ -35,15 +35,18 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 	static final int WIDTH = 780;
 	static final int HEIGHT = 560;
 
-	String id;
+	int e_id, w_id;
+	String store_id, store_section, store_name, store_holder;
 
-	DefaultTableModel e_model = new DefaultTableModel();
-	DefaultTableModel w_model = new DefaultTableModel();
+	DataModel e_model, w_model;
+
+	DefaultTableModel e_tableModel = new DefaultTableModel();
+	DefaultTableModel w_tableModel = new DefaultTableModel();
 
 	JLabel idl, namel, sectionl, holderl, e_records, w_records;
 	JLabel[] labels = new JLabel[4];
 
-	JTable e_list, w_list;
+	JTable e_table, w_table;
 
 	JFrame f;
 
@@ -63,26 +66,38 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 	MainWindow mw;
 
 	@SuppressWarnings("unchecked")
-	public StoreBillWindow(MainWindow mw, String[] data) {
+	public StoreBillWindow(MainWindow mw, String[] store_data) {
 
 		this.mw = mw;
 
-		id = data[0];
-		String name = data[1];
-		String section = data[2];
-		String holder = data[3];
+		e_model = DataModel.Electric;
+		w_model = DataModel.Water;
 
-		f = new JFrame(name + " Electricity And Water Bills");
+		if(e_data.size() > 0) { e_id = Integer.parseInt(e_data.get(e_data.size()-1)[0]) + 1;}
+		else e_id = 1;
+
+		if(w_data.size() > 0) { e_id = Integer.parseInt(w_data.get(w_data.size()-1)[0]) + 1;}
+		else w_id = 1;
+
+		e_data = mw.e_data;
+		w_data = mw.w_data;
+
+		store_id = store_data[0];
+		store_name = store_data[1];
+		store_section = store_data[2];
+		store_holder = store_data[3];
+
+		f = new JFrame(store_name + " Electricity And Water Bills");
 		f.setSize(WIDTH, HEIGHT);
 		f.setLocationRelativeTo(null);
 
 		this.setLayout(null);
 		this.setSize(new Dimension(WIDTH, HEIGHT));
 
-		idl = new JLabel("Store Number: " + id);
-		namel = new JLabel("Store Name: " + name);
-		sectionl = new JLabel("Store Section: " + section);
-		holderl = new JLabel("Store Holder: " + holder);
+		idl = new JLabel("Store ID: " + store_id);
+		namel = new JLabel("Store: " + store_name);
+		sectionl = new JLabel("Section: " + store_section);
+		holderl = new JLabel("Holder: " + store_holder);
 
 		labels[0] = idl;
 		labels[1] = namel;
@@ -92,14 +107,11 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		int ii = 0;
 		int jj = 0;
 		for (int i = 0; i < labels.length; i++) {
-
 			if (i % 2 == 0) {
-
 				labels[i].setBounds(padding, padding + compPadding * 0 + compHeight * ii - compPadding, compWidth,
 						compHeight);
 				ii++;
 			} else {
-
 				labels[i].setBounds(padding + compPadding + compWidth,
 						padding + compPadding * 0 + compHeight * jj - compPadding, compWidth, compHeight);
 				jj++;
@@ -115,56 +127,50 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		w_records.setBounds(padding, padding + compPadding * 3 + compHeight * 9, compWidth, compHeight);
 		add(w_records);
 
-		e_model.setColumnIdentifiers(e_columnNames);
-		w_model.setColumnIdentifiers(w_columnNames);
+		e_tableModel.setColumnIdentifiers(e_columnNames);
+		w_tableModel.setColumnIdentifiers(w_columnNames);
 
-		e_list = new JTable() {
-
+		e_table = new JTable() {
 			public boolean isCellEditable(int row, int column) {
 
 				return false;
 			}
 		};
-		e_list.setModel(e_model);
-		e_list.addMouseListener(new MouseAdapter() {
-
+		e_table.setModel(e_tableModel);
+		e_table.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
-
 				JTable table = (JTable) me.getSource();
 				Point p = me.getPoint();
 				e_row = table.rowAtPoint(p);
 			}
 		});
 
-		w_list = new JTable() {
-
+		w_table = new JTable() {
 			public boolean isCellEditable(int row, int column) {
 
 				return false;
 			}
 		};
-		w_list.setModel(w_model);
-		w_list.addMouseListener(new MouseAdapter() {
-
+		w_table.setModel(w_tableModel);
+		w_table.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
-
 				JTable table = (JTable) me.getSource();
 				Point p = me.getPoint();
 				w_row = table.rowAtPoint(p);
 			}
 		});
 
-		int e_list_y = padding + compHeight * 3 + compPadding * 1;
-		int w_list_y = padding + compHeight * 10 + compPadding * 3;
+		int e_table_y = padding + compHeight * 3 + compPadding * 1;
+		int w_table_y = padding + compHeight * 10 + compPadding * 3;
 
-		JScrollPane e_listsp = new JScrollPane(e_list);
-		e_listsp.setBounds(padding, e_list_y, WIDTH - padding * 2 - compPadding - buttonWidth, compHeight * 6);
+		JScrollPane e_tablesp = new JScrollPane(e_table);
+		e_tablesp.setBounds(padding, e_table_y, WIDTH - padding * 2 - compPadding - buttonWidth, compHeight * 6);
 
-		JScrollPane w_listsp = new JScrollPane(w_list);
-		w_listsp.setBounds(padding, w_list_y, WIDTH - padding * 2 - compPadding - buttonWidth, compHeight * 6);
+		JScrollPane w_tablesp = new JScrollPane(w_table);
+		w_tablesp.setBounds(padding, w_table_y, WIDTH - padding * 2 - compPadding - buttonWidth, compHeight * 6);
 
-		add(e_listsp);
-		add(w_listsp);
+		add(e_tablesp);
+		add(w_tablesp);
 
 		report_type = new JComboBox(report_types);
 		report_type.setBounds(padding, HEIGHT - padding * 2 - compHeight, compWidth, compHeight);
@@ -182,9 +188,8 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		e_buttons[2] = e_delete;
 
 		for (int i = 0; i < e_buttons.length; i++) {
-
 			e_buttons[i].setBounds(WIDTH - padding + compPadding / 2 - buttonWidth,
-					e_list_y + compHeight * i + compPadding * i, buttonWidth - 10, compHeight);
+					e_table_y + compHeight * i + compPadding * i, buttonWidth - 10, compHeight);
 			e_buttons[i].addActionListener(this);
 			add(e_buttons[i]);
 		}
@@ -197,13 +202,26 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		w_buttons[2] = w_delete;
 
 		for (int i = 0; i < e_buttons.length; i++) {
-
 			w_buttons[i].setBounds(WIDTH - padding + compPadding / 2 - buttonWidth,
-					w_list_y + compHeight * i + compPadding * i, buttonWidth - 10, compHeight);
+					w_table_y + compHeight * i + compPadding * i, buttonWidth - 10, compHeight);
 			w_buttons[i].addActionListener(this);
 			add(w_buttons[i]);
 		}
-		getData();
+
+		for (String[] e : e_data){
+			if(e[1].equals(store_id)){
+				String[] entry = {e[2], e[3], e[5]};
+				e_tableModel.addRow(entry);
+			}
+		}
+
+		for (String[] w : w_data){
+			if(w[1].equals(store_id)){
+				String[] entry = {w[2], w[3], w[5]};
+				w_tableModel.addRow(entry);
+			}
+		}
+
 		checkLists();
 
 		f.setResizable(false);
@@ -211,94 +229,6 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		f.setVisible(true);
 	}
 
-	public String[][] convertList(ArrayList<String[]> data) {
-
-		String[][] newData = new String[data.size()][e_columnNames.length];
-		for (int i = 0; i < data.size(); i++) {
-
-			newData[i] = data.get(i);
-		}
-
-		return newData;
-	}
-
-	public void addEntry(int bit, String[] entry) {
-
-		switch (bit) {
-		case 0:
-			e_data.add(entry);
-			e_model.addRow(entry);
-			mw.f2 = new File("res/files/Electric Bills.xlsx");
-			
-			try {
-				mw.fis2 = new FileInputStream(mw.f2);
-				mw.workbook2 = new XSSFWorkbook(mw.fis2);
-				mw.sheet2 = mw.workbook2.getSheetAt(0);
-				int x = mw.sheet2.getLastRowNum() + 1;
-				Cell cell = null;
-
-				Row dataRow = mw.sheet2.createRow(x);
-				dataRow.createCell(0).setCellValue(x);
-				dataRow.createCell(1).setCellValue(id);
-				dataRow.createCell(2).setCellValue(entry[0]);
-				dataRow.createCell(3).setCellValue(entry[1]);
-				dataRow.createCell(4).setCellValue(entry[2]);
-
-				mw.fis2.close();
-				
-				FileOutputStream outFile = new FileOutputStream(mw.f2);
-				mw.workbook2.write(outFile);
-				outFile.close();
-					
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			break;
-
-		case 1:
-			w_data.add(entry);
-			w_model.addRow(entry);
-			
-			mw.f3 = new File("res/files/Water Bills.xlsx");
-
-			try {
-
-				mw.fis3 = new FileInputStream(mw.f3);
-				mw.workbook3 = new XSSFWorkbook(mw.fis3);
-				mw.sheet3 = mw.workbook3.getSheetAt(0);
-				int x = mw.sheet3.getLastRowNum() + 1;
-				Cell cell = null;
-
-				Row dataRow = mw.sheet3.createRow(x);
-				dataRow.createCell(0).setCellValue(x);
-				dataRow.createCell(1).setCellValue(id);
-				dataRow.createCell(2).setCellValue(entry[0]);
-				dataRow.createCell(3).setCellValue(entry[1]);
-				dataRow.createCell(4).setCellValue(entry[2]);
-
-				mw.fis3.close();
-				
-				FileOutputStream outFile = new FileOutputStream(mw.f3);
-				mw.workbook3.write(outFile);
-				outFile.close();
-					
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			break;
-		default:
-			System.out.println("Invalid Case");
-			break;
-		}
-
-		this.revalidate();
-	}
 
 	public void checkLists() {
 
@@ -323,60 +253,44 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		}
 	}
 
-	public void deleteRow(int bit) {
-
-		if (bit == 0) {
-
-			e_data.remove(e_row);
-			e_model.removeRow(e_row);
-		} else {
-
-			w_data.remove(w_row);
-			w_model.removeRow(w_row);
-		}
-	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
 		if (e.getActionCommand().equals(" Add ")) {
-
 			new AddOrEditBillWindow(this, true, true, null);
+
 		} else if (e.getActionCommand().equals(" Edit ")) {
-
 			if (e_row != -1) {
-
 				new AddOrEditBillWindow(this, true, false, e_data.get(e_row));
 			} else {
-
 				JOptionPane.showMessageDialog(null, "Select a row first.");
 			}
+
 		} else if (e.getActionCommand().equals(" Delete ")) {
-
 			if (e_row != -1) {
-
-				deleteRow(0);
+				e_model.remove((Integer) e_tableModel.getValueAt(e_row, 0));
+				e_data.remove(e_row);
+				e_tableModel.removeRow(e_row);
 			} else {
-
 				JOptionPane.showMessageDialog(null, "Select a row first.");
 			}
+
 		} else if (e.getActionCommand().equals("Add")) {
-
 			new AddOrEditBillWindow(this, false, true, null);
+
 		} else if (e.getActionCommand().equals("Edit")) {
-
 			if (w_row != -1) {
-
 				new AddOrEditBillWindow(this, false, false, w_data.get(w_row));
 			} else {
-
 				JOptionPane.showMessageDialog(null, "Select a row first.");
 			}
+
 		} else if (e.getActionCommand().equals("Delete")) {
-
 			if (w_row != -1) {
-
-				deleteRow(1);
+				w_model.remove((Integer) w_tableModel.getValueAt(w_row, 0));
+				w_data.remove(w_row);
+				w_tableModel.removeRow(w_row);
 			} else {
 
 				JOptionPane.showMessageDialog(null, "Select a row first.");
@@ -388,34 +302,5 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		checkLists();
 	}
 	
-	public void getData() {
-		
-		Iterator<Row> rowIterator = mw.sheet2.iterator();
-		
-		rowIterator.next();
-		
-		while(rowIterator.hasNext()) {
-			
-			Row row = rowIterator.next();
-			
-			Iterator<Cell> cellIterator = row.cellIterator();
-			
-			String[] entry = new String[3];
-			
-			int i = 0;
-			
-			while(cellIterator.hasNext()) {
-
-				Cell cell = cellIterator.next();
-				if (cell.getColumnIndex() < 2) continue;
-				System.out.println(cell.getRowIndex() + ":" + cell.getColumnIndex() + " " + cell.toString());
-				entry[i] = cell.toString();
-				i++;
-			}	
-			e_data.add(entry);
-			e_model.addRow(entry);	
-		}
-
-			
-	}
+	
 }

@@ -95,20 +95,19 @@ public class AddStoreWindow extends JPanel implements ActionListener {
 		f.setResizable(false);
 		f.add(this);
 		f.setVisible(true);
-
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-
 		if (ae.getActionCommand().equalsIgnoreCase("Cancel")) {
-
 			f.dispose();
 		} else if (ae.getActionCommand().equalsIgnoreCase("Add")) {
-
 			String[] entry = { Integer.toString(store_id), sectionsircb.getSelectedItem().toString(), nametf.getText(),
-					holdertf.getText() };
-			mw.addEntry(entry);
+			holdertf.getText() };
+			mw.model.add(entry);
+			mw.tableModel.addRow(entry);
+			mw.revalidate();
+			mw.lastId++;
 			f.dispose();
 		}
 	}

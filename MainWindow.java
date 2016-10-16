@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import javax.swing.JButton;
@@ -33,7 +34,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 @SuppressWarnings("serial")
 public class MainWindow extends JPanel implements ActionListener {
-	public String[] sectionList = { "ALL SECTIONS", "1ST FLOOR", "2ND FLOOR",
+	public static String[] sectionList = { "ALL SECTIONS", "1ST FLOOR", "2ND FLOOR",
     "MEAT", "FOOD", "CHICKEN", "FISH",	"VEGETABLE", "FRUIT", "GROCERY",
     "SPECIAL", "MOBILE" };
 
@@ -48,8 +49,8 @@ public class MainWindow extends JPanel implements ActionListener {
 	double evat = 12;
 	double echarge = 12;
 	
-  DataModel model;
-	String[][] data;
+ 	DataModel model, e_model, w_model;
+	ArrayList<String[]> data, e_data, w_data;
 	DefaultTableModel tableModel;
 
 	@SuppressWarnings("rawtypes")
@@ -82,8 +83,15 @@ public class MainWindow extends JPanel implements ActionListener {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public MainWindow() {
     model = DataModel.Stores;
+	e_model = DataModel.Electric;
+	w_model = DataModel.Water;
 
-    lastId = model.getAll().length - 1;
+    e_data = e_model.getAll();
+	w_data = w_model.getAll();
+
+    data = model.getAll(); 
+    if(data.size() > 0) lastId = Integer.parseInt(data.get(data.size()-1)[0]) + 1;
+    	tableModel = new DefaultTableModel();
 		tableModel.setColumnIdentifiers(model.getAttributes());
 
 		this.setLayout(null);
@@ -116,6 +124,11 @@ public class MainWindow extends JPanel implements ActionListener {
 		searchfield.setBounds(padding, padding, WIDTH - padding * 2, compHeight);
 		searchfield.addActionListener(this);
 
+
+		for(String[] d : data){
+			tableModel.addRow(d);
+		}
+
 		list = new JTable() {
 			public boolean isCellEditable(int row, int column) {
 				return false;
@@ -127,7 +140,7 @@ public class MainWindow extends JPanel implements ActionListener {
 				JTable table = (JTable) me.getSource();
 				Point p = me.getPoint();
 				int row = table.rowAtPoint(p);
-				// int column = table.columnAtPoint(p);
+				int column = table.columnAtPoint(p);
 				if (me.getClickCount() == 2 && row != -1) {
 					createBillWindow(row);
 				}
@@ -137,7 +150,7 @@ public class MainWindow extends JPanel implements ActionListener {
 		list.setModel(tableModel);
 		MatteBorder b = new MatteBorder(1, 1, 1, 1, Color.BLACK);
 		list.setBorder(b);
-		
+
 		tablesp = new JScrollPane(list);
 		tablesp.setBounds(padding, padding + compPadding + compHeight,
       WIDTH - padding * 2 - compWidth - compPadding,
@@ -161,29 +174,8 @@ public class MainWindow extends JPanel implements ActionListener {
 		}
 	}
 
-	public void getData() {
-		Iterator<Row> rowIterator = sheets[0].iterator();
-		rowIterator.next();
-
-		while(rowIterator.hasNext()) {
-			Row row = rowIterator.next();
-			Iterator<Cell> cellIterator = row.cellIterator();
-			String[] entry = new String[4];
-			int i = 0;
-
-			while(cellIterator.hasNext()) {
-				Cell cell = cellIterator.next();
-				System.out.println(cell.getRowIndex() + ":" + cell.getColumnIndex());
-				entry[i] = cell.toString();
-				i++;
-			}
-
-			addEntry(entry);
-		}
-	}
-	
 	@SuppressWarnings({ "resource", "unused" })
-	public void createBillWindow(int row) {
+	public StoreBillWindow createBillWindow(int row) {
 		return new StoreBillWindow(this, data.get(row));
 	}
 
@@ -191,4 +183,5 @@ public class MainWindow extends JPanel implements ActionListener {
     evat = v;
     echarge = c;
 	}
+
 }
