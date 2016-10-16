@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -13,12 +12,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 @SuppressWarnings({ "serial", "rawtypes" })
@@ -53,7 +58,7 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 	JComboBox report_type;
 
-	String[] e_columnNames = { "Date", "kW/h", "Amount" };
+	String[] e_columnNames = { "Date", "kWh", "Amount" };
 	String[] w_columnNames = { "Date", "Cubic Meters", "Amount" };
 	String[] report_types = { "Monthly", "Yearly" };
 
@@ -203,7 +208,7 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 			w_buttons[i].addActionListener(this);
 			add(w_buttons[i]);
 		}
-
+		getData();
 		checkLists();
 
 		f.setResizable(false);
@@ -222,27 +227,28 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		return newData;
 	}
 
+	@SuppressWarnings("unused")
 	public void addEntry(int bit, String[] entry) {
 
 		switch (bit) {
 		case 0:
 			e_data.add(entry);
 			e_model.addRow(entry);
-			int x = e_data.size() + w_data.size();
-			mw.f2 = new File("res/files/Bills.xlsx");
+			mw.f2 = new File("res/files/Electric Bills.xlsx");
 			
 			try {
 				mw.fis2 = new FileInputStream(mw.f2);
 				mw.workbook2 = new XSSFWorkbook(mw.fis2);
 				mw.sheet2 = mw.workbook2.getSheetAt(0);
+				int x = mw.sheet2.getLastRowNum() + 1;
 				Cell cell = null;
 
 				Row dataRow = mw.sheet2.createRow(x);
 				dataRow.createCell(0).setCellValue(x);
 				dataRow.createCell(1).setCellValue(id);
-				dataRow.createCell(2).setCellValue(entry[1]);
+				dataRow.createCell(2).setCellValue(entry[0]);
+				dataRow.createCell(3).setCellValue(entry[1]);
 				dataRow.createCell(4).setCellValue(entry[2]);
-				dataRow.createCell(6).setCellValue(entry[0]);
 
 				mw.fis2.close();
 				
@@ -261,27 +267,28 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		case 1:
 			w_data.add(entry);
 			w_model.addRow(entry);
-			x = e_data.size() + w_data.size();
-			mw.f2 = new File("res/files/Bills.xlsx");
+			
+			mw.f3 = new File("res/files/Water Bills.xlsx");
 
 			try {
 
-				mw.fis2 = new FileInputStream(mw.f2);
-				mw.workbook2 = new XSSFWorkbook(mw.fis2);
-				mw.sheet2 = mw.workbook2.getSheetAt(0);
+				mw.fis3 = new FileInputStream(mw.f3);
+				mw.workbook3 = new XSSFWorkbook(mw.fis3);
+				mw.sheet3 = mw.workbook3.getSheetAt(0);
+				int x = mw.sheet3.getLastRowNum() + 1;
 				Cell cell = null;
 
-				Row dataRow = mw.sheet2.createRow(x);
+				Row dataRow = mw.sheet3.createRow(x);
 				dataRow.createCell(0).setCellValue(x);
 				dataRow.createCell(1).setCellValue(id);
+				dataRow.createCell(2).setCellValue(entry[0]);
 				dataRow.createCell(3).setCellValue(entry[1]);
-				dataRow.createCell(5).setCellValue(entry[2]);
-				dataRow.createCell(6).setCellValue(entry[0]);
+				dataRow.createCell(4).setCellValue(entry[2]);
 
-				mw.fis2.close();
+				mw.fis3.close();
 				
-				FileOutputStream outFile = new FileOutputStream(mw.f2);
-				mw.workbook2.write(outFile);
+				FileOutputStream outFile = new FileOutputStream(mw.f3);
+				mw.workbook3.write(outFile);
 				outFile.close();
 					
 			} catch (FileNotFoundException e) {
@@ -297,9 +304,6 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		}
 
 		this.revalidate();
-
-
-
 	}
 
 	public void checkLists() {
@@ -391,7 +395,33 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 	}
 	
 	public void getData() {
-	
 		
+		Iterator<Row> rowIterator = mw.sheet2.iterator();
+		
+		rowIterator.next();
+		
+		while(rowIterator.hasNext()) {
+			
+			Row row = rowIterator.next();
+			
+			Iterator<Cell> cellIterator = row.cellIterator();
+			
+			String[] entry = new String[3];
+			
+			int i = 0;
+			
+			while(cellIterator.hasNext()) {
+
+				Cell cell = cellIterator.next();
+				if (cell.getColumnIndex() < 2) continue;
+				System.out.println(cell.getRowIndex() + ":" + cell.getColumnIndex() + " " + cell.toString());
+				entry[i] = cell.toString();
+				i++;
+			}	
+			e_data.add(entry);
+			e_model.addRow(entry);	
+		}
+
+			
 	}
 }

@@ -21,9 +21,9 @@ public class SettingsWindow extends JPanel implements ActionListener {
 
 	JFrame f;
 
-	JLabel elec, water, elec1, water1, water2, water3, water4;
+	JLabel elec, water, elec1, water1, water2, water3, water4, water5;
 
-	JTextField elec1t, elec2t, elec3t, watert1, watert2, watert3, watert4;
+	JTextField elec1t, elec2t, elec3t, watert1, watert2, watert3, watert4, watert5;
 
 	JButton set, cancel;
 
@@ -57,7 +57,7 @@ public class SettingsWindow extends JPanel implements ActionListener {
 		water = new JLabel("Water");
 		water.setBounds(WIDTH / 2, padding, compWidth, compHeight);
 
-		elec1t = new JTextField(Double.toString(mw.elec1), 3);
+		elec1t = new JTextField(Double.toString(mw.elec1), 5);
 		elec1t.setBounds(padding + compPadding + compWidth, padding + compHeight + compPadding, compWidth / 2,
 				compHeight);
 
@@ -73,20 +73,27 @@ public class SettingsWindow extends JPanel implements ActionListener {
 		water4 = new JLabel("E-VAT");
 		water4.setBounds(WIDTH / 2, padding + compHeight * 4 + compPadding * 4, compWidth, compHeight);
 
-		watert1 = new JTextField(Double.toString(mw.water1), 3);
+		water5 = new JLabel("Maintenance Charge");
+		water5.setBounds(WIDTH / 2, padding + compHeight * 5 + compPadding * 5, compWidth, compHeight);
+
+		watert1 = new JTextField(Double.toString(mw.water1), 5);
 		watert1.setBounds(WIDTH / 2 + compWidth + compPadding, padding + compHeight + compPadding, compWidth / 2,
 				compHeight);
 
-		watert2 = new JTextField(Double.toString(mw.water2), 3);
+		watert2 = new JTextField(Double.toString(mw.water2), 5);
 		watert2.setBounds(WIDTH / 2 + compWidth + compPadding, padding + compHeight * 2 + compPadding * 2,
 				compWidth / 2, compHeight);
 
-		watert3 = new JTextField(Double.toString(mw.water3), 3);
+		watert3 = new JTextField(Double.toString(mw.water3), 5);
 		watert3.setBounds(WIDTH / 2 + compWidth + compPadding, padding + compHeight * 3 + compPadding * 3,
 				compWidth / 2, compHeight);
 
-		watert4 = new JTextField(Double.toString(mw.water4), 3);
+		watert4 = new JTextField(Double.toString(mw.water4), 5);
 		watert4.setBounds(WIDTH / 2 + compWidth + compPadding, padding + compHeight * 4 + compPadding * 4,
+				compWidth / 2, compHeight);
+		
+		watert5 = new JTextField(Double.toString(mw.water5), 3);
+		watert5.setBounds(WIDTH / 2 + compWidth + compPadding, padding + compHeight * 5 + compPadding * 5,
 				compWidth / 2, compHeight);
 
 		add(set);
@@ -118,7 +125,7 @@ public class SettingsWindow extends JPanel implements ActionListener {
 
 				mw.setSettings(Double.parseDouble(elec1t.getText()), Double.parseDouble(watert1.getText()),
 						Double.parseDouble(watert2.getText()), Double.parseDouble(watert3.getText()),
-						Double.parseDouble(watert4.getText()));
+						Double.parseDouble(watert4.getText()), Double.parseDouble(watert5.getText()));
 				f.dispose();
 			} catch (Exception e) {
 

@@ -125,13 +125,46 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 				.setText(months[Integer.parseInt(dateComp[1])] + " " + dateComp[2] + ", " + dateComp[0]);
 	}
 
+	public String getElectricityAmount() {
+
+		double amount = Double.parseDouble(input.getText()) * sbw.mw.elec1;
+
+		return String.valueOf(amount);
+	}
+
+	public String getWaterAmount() {
+
+		MainWindow main = sbw.mw;
+
+		int bruh = Integer.parseInt(input.getText());
+
+		if (bruh > 10) {
+
+			double base = main.water1;
+			base += (bruh - 10) * main.water2;
+			double e_charge = base + (base * (main.water3 / 100));
+			double maintenance = e_charge + main.water5;
+			double amount = maintenance + (maintenance * (main.water4 / 100));
+
+			return String.valueOf(amount);
+		} else {
+
+			double base = main.water1;
+			double e_charge = base + (base * (main.water3 / 100));
+			double maintenance = e_charge + main.water5;
+			double amount = maintenance + (maintenance * (main.water4 / 100));
+
+			return String.valueOf(amount);
+		}
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 
 		if (ae.getActionCommand().equalsIgnoreCase("Cancel")) {
 
 			f.dispose();
-		} else if (ae.getActionCommand().equalsIgnoreCase("Add") || ae.getActionCommand().equalsIgnoreCase("Edit")) {
+		} else if (ae.getActionCommand().equalsIgnoreCase("Add")) {
 
 			boolean isInt = true;
 
@@ -147,11 +180,13 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 
 				if (elec) {
 
-					String[] entry = { datePicker.getJFormattedTextField().getText(), input.getText(), "LOL AMOUNT" };
+					String[] entry = { datePicker.getJFormattedTextField().getText(), input.getText(),
+							this.getElectricityAmount() };
 					sbw.addEntry(0, entry);
 				} else {
 
-					String[] entry = { datePicker.getJFormattedTextField().getText(), input.getText(), "LOL AMOUNT" };
+					String[] entry = { datePicker.getJFormattedTextField().getText(), input.getText(),
+							this.getWaterAmount() };
 					sbw.addEntry(1, entry);
 				}
 
@@ -161,6 +196,8 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 
 				JOptionPane.showMessageDialog(null, "Enter valid " + unit);
 			}
+		} else if (ae.getActionCommand().equalsIgnoreCase("Edit")) {
+
 		}
 	}
 
