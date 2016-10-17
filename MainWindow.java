@@ -5,13 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -26,62 +20,43 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableModel;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial"})
 public class MainWindow extends JPanel implements ActionListener {
+	public static String[] sectionList = { "ALL SECTIONS", "1ST FLOOR", "2ND FLOOR",
+    "MEAT", "FOOD", "CHICKEN", "FISH",	"VEGETABLE", "FRUIT", "GROCERY",
+    "SPECIAL", "MOBILE" };
 
-	int tempid = 1;
+	int WIDTH = 800;
+	int HEIGHT = 600;
 	int compWidth = 120;
-	int compHeight = 25;
+	int compHeight = 32;
 	int compPadding = 10;
 	int padding = 25;
-	final int WIDTH = 800;
-	final int HEIGHT = 600;
 	
-	double elec1 = 8.50;
-	double water1 = 314.33;
-	double water2 = 31.47;
-	double water3 = 12;
-	double water4 = 12;
-	double water5 = 6;
+	int lastId = 1;
+	double kwhcharge = 8.50;
+	double evat = 12;
+	double echarge = 12;
+	double mcharge = 6;
+	double first_ten_cubic_meters = 314.33;
+	double exceeding_cubic_meters = 31.47;
 	
+ 	DataModel model, e_model, w_model;
+	ArrayList<String[]> data, e_data, w_data;
+	DefaultTableModel tableModel;
+
 	JButton add, settings;
-
-	@SuppressWarnings("rawtypes")
 	JComboBox sections;
-
 	JTextField searchfield;
-
 	JTable list;
-
 	JScrollPane tablesp;
-
 	JLabel sectionsl;
 
-	public static String[] sectionList = { "ALL SECTIONS", "1ST FLOOR", "2ND FLOOR", "MEAT", "FOOD", "CHICKEN", "FISH",
-			"VEGETABLE", "FRUIT", "GROCERY", "SPECIAL", "MOBILE" };
-	String[] columnNames = { "Store ID", "Store Section", "Store Name", "Store Owner" };
-
-	ArrayList<String[]> data = new ArrayList<>();
-
-	DefaultTableModel model = new DefaultTableModel();
-
-	File f, f2, f3;
-	FileInputStream fis, fis2, fis3;
-	XSSFWorkbook workbook, workbook2, workbook3;	
-	XSSFSheet sheet, sheet2, sheet3;
-	
 	public static void main(String[] args) {
-
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
 				| UnsupportedLookAndFeelException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -98,121 +73,16 @@ public class MainWindow extends JPanel implements ActionListener {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public MainWindow() {
-		f = new File("res/files/Stores.xlsx");
-		
-		try {
-			fis = new FileInputStream(f);
-			workbook = new XSSFWorkbook(fis);
-			sheet = workbook.getSheetAt(0);
-		} catch (IOException e) {
-			
-			workbook = new XSSFWorkbook();
-			sheet = workbook.createSheet("Stores");
+    model = DataModel.Stores;
+	e_model = DataModel.Electric;
+	w_model = DataModel.Water;
+    e_data = e_model.getAll();
+	w_data = w_model.getAll();
+    data = model.getAll(); 
 
-			Row dataRow = sheet.createRow(0);
-			dataRow.createCell(0).setCellValue(columnNames[0]);
-			dataRow.createCell(1).setCellValue(columnNames[1]);
-			dataRow.createCell(2).setCellValue(columnNames[2]);
-			dataRow.createCell(3).setCellValue(columnNames[3]);
-
-			try {
-				FileOutputStream out = new FileOutputStream(new File("res/files/Stores.xlsx"));
-				workbook.write(out);
-				out.close();
-				System.out.println("Excel written successfully..");
-				
-			} catch (FileNotFoundException ee) {
-				e.printStackTrace();
-			
-			} catch (IOException ee) {
-				e.printStackTrace();
-			}
-
-			System.out.println("File not found. Created new sheet.");
-			e.printStackTrace();
-		}
-
-		f2= new File("res/files/Electric Bills.xlsx");
-		
-		try {
-			fis2 = new FileInputStream(f2);
-			workbook2 = new XSSFWorkbook(fis2);
-			sheet2 = workbook2.getSheetAt(0);
-
-		} catch (IOException e) {
-			
-			workbook2 = new XSSFWorkbook();
-			sheet2 = workbook2.createSheet("Electric Bills");
-
-
-			Row dataRow = sheet2.createRow(0);
-			
-
-			dataRow.createCell(0).setCellValue("id");
-			dataRow.createCell(1).setCellValue("stall_id");
-			dataRow.createCell(2).setCellValue("date");
-			dataRow.createCell(3).setCellValue("kwh");
-			dataRow.createCell(4).setCellValue("e_amount");
-
-			try {
-				FileOutputStream out = new FileOutputStream(new File("res/files/Electric Bills.xlsx"));
-				workbook2.write(out);
-				out.close();
-				System.out.println("Excel written successfully..");
-				
-			} catch (FileNotFoundException ee) {
-				e.printStackTrace();
-			
-			} catch (IOException ee) {
-				e.printStackTrace();
-			}
-
-			System.out.println("File not found. Created new sheet.");
-			e.printStackTrace();
-		}
-
-		f3= new File("res/files/Water Bills.xlsx");
-		
-		try {
-			fis3 = new FileInputStream(f3);
-			workbook3 = new XSSFWorkbook(fis3);
-			sheet3 = workbook3.getSheetAt(0);
-
-		} catch (IOException e) {
-			
-			workbook3 = new XSSFWorkbook();
-			sheet3 = workbook3.createSheet("Water Bills");
-
-
-			Row dataRow = sheet3.createRow(0);
-			
-
-			dataRow.createCell(0).setCellValue("id");
-			dataRow.createCell(1).setCellValue("stall_id");
-			dataRow.createCell(2).setCellValue("date");
-			dataRow.createCell(3).setCellValue("cubic/m");
-			dataRow.createCell(4).setCellValue("w_amount");
-
-			try {
-				FileOutputStream out = new FileOutputStream(new File("res/files/Water Bills.xlsx"));
-				workbook3.write(out);
-				out.close();
-				System.out.println("Excel written successfully..");
-				
-			} catch (FileNotFoundException ee) {
-				e.printStackTrace();
-			
-			} catch (IOException ee) {
-				e.printStackTrace();
-			}
-
-			System.out.println("File not found. Created new sheet.");
-			e.printStackTrace();
-		}
-		
-		
-		
-		model.setColumnIdentifiers(columnNames);
+    	lastId = model.getNextRowNum();
+    	tableModel = new DefaultTableModel();
+		tableModel.setColumnIdentifiers(model.getAttributes());
 
 		this.setLayout(null);
 		this.setSize(new Dimension(WIDTH, HEIGHT));
@@ -222,60 +92,54 @@ public class MainWindow extends JPanel implements ActionListener {
 		add = new JButton("Add Store");
 		add.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i, compWidth, compHeight);
 		add.addActionListener(this);
-
 		i++;
 
 		settings = new JButton("Settings");
-		settings.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i, compWidth,
-				compHeight);
+		settings.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i, compWidth, compHeight);
 		settings.addActionListener(this);
-
 		i++;
 
 		sectionsl = new JLabel("Sections: ");
-		sectionsl.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i, compWidth,
-				compHeight);
-
+		sectionsl.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i, compWidth, compHeight);
 		i++;
 
 		sections = new JComboBox(sectionList);
-		sections.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i, compWidth,
-				compHeight);
+		sections.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i, compWidth, compHeight);
 
 		searchfield = new JTextField("", 255);
 		searchfield.setBounds(padding, padding, WIDTH - padding * 2, compHeight);
 		searchfield.addActionListener(this);
 
+		for(String[] d : data){
+			tableModel.addRow(d);
+		}
+
 		list = new JTable() {
-
 			public boolean isCellEditable(int row, int column) {
-
 				return false;
 			}
 		};
+
 		list.addMouseListener(new MouseAdapter() {
-
 			public void mousePressed(MouseEvent me) {
-
 				JTable table = (JTable) me.getSource();
 				Point p = me.getPoint();
 				int row = table.rowAtPoint(p);
-				// int column = table.columnAtPoint(p);
+				int column = table.columnAtPoint(p);
 				if (me.getClickCount() == 2 && row != -1) {
-
 					createBillWindow(row);
 				}
 			}
 		});
-		list.setModel(model);
+
+		list.setModel(tableModel);
 		MatteBorder b = new MatteBorder(1, 1, 1, 1, Color.BLACK);
 		list.setBorder(b);
 
-		getData();
-		
 		tablesp = new JScrollPane(list);
-		tablesp.setBounds(padding, padding + compPadding + compHeight, WIDTH - padding * 2 - compWidth - compPadding,
-				HEIGHT - padding * 3 - compPadding * 2 - compHeight);
+		tablesp.setBounds(padding, padding + compPadding + compHeight,
+      WIDTH - padding * 2 - compWidth - compPadding,
+			HEIGHT - padding * 3 - compPadding * 2 - compHeight);
 
 		add(add);
 		add(settings);
@@ -287,109 +151,21 @@ public class MainWindow extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
 		if (e.getActionCommand().equalsIgnoreCase("Add Store")) {
-
-			new AddStoreWindow(this, tempid);
+			new AddStoreWindow(this, lastId);
 		} else if (e.getActionCommand().equalsIgnoreCase("Settings")) {
-
 			new SettingsWindow(this);
 		} else if (e.getSource().getClass().toString().equals("class javax.swing.JTextField")) {
-
-			// Do search query
 		}
 	}
 
-	public String[][] convertList(ArrayList<String[]> data) {
-
-		String[][] newData = new String[data.size()][columnNames.length];
-		for (int i = 0; i < data.size(); i++) {
-
-			newData[i] = data.get(i);
-		}
-
-		return newData;
+	public StoreBillWindow createBillWindow(int row) {
+		return new StoreBillWindow(this, data.get(row));
 	}
 
-	public void getData() {
-		
-		Iterator<Row> rowIterator = sheet.iterator();
-		
-		rowIterator.next();
-		
-		while(rowIterator.hasNext()) {
-			
-			Row row = rowIterator.next();
-			
-			Iterator<Cell> cellIterator = row.cellIterator();
-			
-			String[] entry = new String[4];
-			
-			int i = 0;
-			
-			while(cellIterator.hasNext()) {
-				
-				Cell cell = cellIterator.next();
-				
-				System.out.println(cell.getRowIndex() + ":" + cell.getColumnIndex());
-				
-				entry[i] = cell.toString();
-				
-				i++;
-			}
-
-			addEntry(entry);
-		}
-	}
-	
-	@SuppressWarnings({ "resource", "unused" })
-	public void addEntry(String[] entry) {
-
-		data.add(entry);
-		model.addRow(entry);
-		tempid++;
-
-	 	int x = data.size();
-		System.out.println(x);
-		File f = new File("res/files/Stores.xlsx");
-
-		try {
-			FileInputStream fis = new FileInputStream(f);
-			XSSFWorkbook workbook = new XSSFWorkbook(fis);
-			XSSFSheet sheet = workbook.getSheetAt(0);
-			Cell cell = null;
-
-			Row dataRow = sheet.createRow(x);
-			dataRow.createCell(0).setCellValue(entry[0]);
-			dataRow.createCell(1).setCellValue(entry[1]);
-			dataRow.createCell(2).setCellValue(entry[2]);
-			dataRow.createCell(3).setCellValue(entry[3]);
-
-			fis.close();
-			
-			FileOutputStream outFile = new FileOutputStream(f);
-			workbook.write(outFile);
-			outFile.close();
-			
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void setSettings(double v, double c) {
+		evat = v;
+		echarge = c;
 	}
 
-	public void createBillWindow(int row) {
-
-		new StoreBillWindow(this, data.get(row));
-	}
-
-	public void setSettings(double e1, double w1, double w2, double w3, double w4, double w5) {
-
-		elec1 = e1;
-		water1 = w1;
-		water2 = w2;
-		water3 = w3;
-		water4 = w4;
-		water5 = w5;
-	}
 }

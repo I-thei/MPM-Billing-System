@@ -17,7 +17,7 @@ public class AddStoreWindow extends JPanel implements ActionListener {
 	int compPadding = 20;
 	int compWidth = 180;
 	int compHeight = 25;
-	final int WIDTH = 500;
+	final int WIDTH = 540;
 	final int HEIGHT = 300;
 
 	JLabel section, holder, name, id, iddisp;
@@ -95,20 +95,19 @@ public class AddStoreWindow extends JPanel implements ActionListener {
 		f.setResizable(false);
 		f.add(this);
 		f.setVisible(true);
-
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-
 		if (ae.getActionCommand().equalsIgnoreCase("Cancel")) {
-
 			f.dispose();
 		} else if (ae.getActionCommand().equalsIgnoreCase("Add")) {
-
 			String[] entry = { Integer.toString(store_id), sectionsircb.getSelectedItem().toString(), nametf.getText(),
-					holdertf.getText() };
-			mw.addEntry(entry);
+			holdertf.getText() };
+			mw.model.add(entry);
+			mw.tableModel.addRow(entry);
+			mw.revalidate();
+			mw.lastId++;
 			f.dispose();
 		}
 	}

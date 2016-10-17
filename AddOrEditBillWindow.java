@@ -51,10 +51,8 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 
 		String title = "";
 		if (add) {
-
 			title = "Add";
 		} else {
-
 			title = "Edit";
 		}
 
@@ -69,12 +67,11 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 		date_l.setBounds(padding, padding, 100, compHeight);
 
 		if (elec) {
-
 			unit = "kW";
 		} else {
-
 			unit = "Cubic Meters";
 		}
+
 		kW_or_cm_l = new JLabel(unit);
 		kW_or_cm_l.setBounds(padding, padding + compPadding * 2 + compHeight * 2, 100, compHeight);
 
@@ -88,7 +85,6 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 		p.put("text.year", "Year");
 
 		datePanel = new JDatePanelImpl(model, p);
-
 		datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
 		datePicker.setBounds(padding, padding + compHeight + compPadding, 200, compHeight);
 
@@ -120,85 +116,81 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 
 		String date = datePicker.getJFormattedTextField().getText();
 		String[] dateComp = date.split("-");
-
 		datePicker.getJFormattedTextField()
 				.setText(months[Integer.parseInt(dateComp[1])] + " " + dateComp[2] + ", " + dateComp[0]);
 	}
 
+	@Override
+	public void actionPerformed(ActionEvent ae) {
+		if (ae.getActionCommand().equalsIgnoreCase("Cancel")) {
+			f.dispose();
+		} else if (ae.getActionCommand().equalsIgnoreCase("Add") || ae.getActionCommand().equalsIgnoreCase("Edit")) {
+			boolean isInt = true;
+
+			try {
+				Integer.parseInt(input.getText());
+			} catch (NumberFormatException e) {
+				isInt = false;
+			}
+
+			if (isInt) {
+				if (elec) {
+					String[] e_entry = { Integer.toString(sbw.e_id), sbw.store_id,
+							datePicker.getJFormattedTextField().getText(), input.getText(), "RATE/ what to put?",
+							getElectricityAmount() };
+					sbw.mw.e_model.add(e_entry);
+					String[] entry = { e_entry[0], e_entry[2], e_entry[3], e_entry[5] };
+					sbw.e_tableModel.addRow(entry);
+					sbw.e_id++;
+				} else {
+
+					String[] w_entry = { Integer.toString(sbw.w_id), sbw.store_id,
+							datePicker.getJFormattedTextField().getText(), input.getText(), "RATE/ what to put?",
+							getWaterAmount() };
+					sbw.mw.w_model.add(w_entry);
+					String[] entry = { w_entry[0], w_entry[2], w_entry[3], w_entry[5] };
+					sbw.w_tableModel.addRow(entry);
+					sbw.w_id++;
+				}
+
+				sbw.checkLists();
+				sbw.revalidate();
+				f.dispose();
+			} else {
+
+				JOptionPane.showMessageDialog(null, "Enter valid " + unit);
+			}
+		}
+	}
+
 	public String getElectricityAmount() {
 
-		double amount = Double.parseDouble(input.getText()) * sbw.mw.elec1;
+		Double amount = Double.parseDouble(input.getText()) * sbw.mw.kwhcharge;
 
 		return String.valueOf(amount);
 	}
 
 	public String getWaterAmount() {
 
-		MainWindow main = sbw.mw;
+		Double cubicm = Double.parseDouble(input.getText());
+		Double amount = (double) 0;
+		Double initial_amount = sbw.mw.first_ten_cubic_meters;
+		Double additional_amount;
 
-		int bruh = Integer.parseInt(input.getText());
+		if (cubicm > 10) {
 
-		if (bruh > 10) {
-
-			double base = main.water1;
-			base += (bruh - 10) * main.water2;
-			double e_charge = base + (base * (main.water3 / 100));
-			double maintenance = e_charge + main.water5;
-			double amount = maintenance + (maintenance * (main.water4 / 100));
-
-			return String.valueOf(amount);
+			additional_amount = (cubicm - 10) * sbw.mw.exceeding_cubic_meters;
 		} else {
 
-			double base = main.water1;
-			double e_charge = base + (base * (main.water3 / 100));
-			double maintenance = e_charge + main.water5;
-			double amount = maintenance + (maintenance * (main.water4 / 100));
-
-			return String.valueOf(amount);
+			additional_amount = (double) 0;
 		}
+
+		amount += initial_amount;
+		amount += additional_amount;
+		amount += amount * (sbw.mw.echarge / 100);
+		amount += sbw.mw.mcharge;
+		amount += amount * (sbw.mw.evat / 100);
+
+		return String.valueOf(amount);
 	}
-
-	@Override
-	public void actionPerformed(ActionEvent ae) {
-
-		if (ae.getActionCommand().equalsIgnoreCase("Cancel")) {
-
-			f.dispose();
-		} else if (ae.getActionCommand().equalsIgnoreCase("Add")) {
-
-			boolean isInt = true;
-
-			try {
-
-				Integer.parseInt(input.getText());
-			} catch (NumberFormatException e) {
-
-				isInt = false;
-			}
-
-			if (isInt) {
-
-				if (elec) {
-
-					String[] entry = { datePicker.getJFormattedTextField().getText(), input.getText(),
-							this.getElectricityAmount() };
-					sbw.addEntry(0, entry);
-				} else {
-
-					String[] entry = { datePicker.getJFormattedTextField().getText(), input.getText(),
-							this.getWaterAmount() };
-					sbw.addEntry(1, entry);
-				}
-
-				sbw.checkLists();
-				f.dispose();
-			} else {
-
-				JOptionPane.showMessageDialog(null, "Enter valid " + unit);
-			}
-		} else if (ae.getActionCommand().equalsIgnoreCase("Edit")) {
-
-		}
-	}
-
 }
