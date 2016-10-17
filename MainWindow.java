@@ -85,12 +85,11 @@ public class MainWindow extends JPanel implements ActionListener {
     model = DataModel.Stores;
 	e_model = DataModel.Electric;
 	w_model = DataModel.Water;
-
     e_data = e_model.getAll();
 	w_data = w_model.getAll();
     data = model.getAll(); 
 
-    if(data.size() > 0) lastId = Integer.parseInt(data.get(data.size()-1)[0]) + 1;
+    	lastId = model.getNextRowNum();
     	tableModel = new DefaultTableModel();
 		tableModel.setColumnIdentifiers(model.getAttributes());
 
@@ -100,30 +99,25 @@ public class MainWindow extends JPanel implements ActionListener {
 		int i = 1;
 
 		add = new JButton("Add Store");
-		add.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i,
-      compWidth, compHeight);
+		add.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i, compWidth, compHeight);
 		add.addActionListener(this);
 		i++;
 
 		settings = new JButton("Settings");
-		settings.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i,
-      compWidth, compHeight);
+		settings.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i, compWidth, compHeight);
 		settings.addActionListener(this);
 		i++;
 
 		sectionsl = new JLabel("Sections: ");
-		sectionsl.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i,
-      compWidth, compHeight);
+		sectionsl.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i, compWidth, compHeight);
 		i++;
 
 		sections = new JComboBox(sectionList);
-		sections.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i,
-      compWidth, compHeight);
+		sections.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i, compWidth, compHeight);
 
 		searchfield = new JTextField("", 255);
 		searchfield.setBounds(padding, padding, WIDTH - padding * 2, compHeight);
 		searchfield.addActionListener(this);
-
 
 		for(String[] d : data){
 			tableModel.addRow(d);

@@ -33,10 +33,8 @@ public enum DataModel {
   }
 
   public static boolean initialize() {
-    String path = DIRECTORY + FILENAME;
-
     try {
-      FileInputStream in = new FileInputStream(new File(path));
+      FileInputStream in = new FileInputStream(new File(DIRECTORY + FILENAME));
       workbook = new XSSFWorkbook(in);
       Sheet  sheet = workbook.getSheetAt(0);
       return true;
@@ -185,4 +183,9 @@ public enum DataModel {
     }
     return true;
 }
+
+  public int getNextRowNum() {
+    int id = workbook.getSheet(name()).getLastRowNum() + 1;
+    return id;
+  }
 }

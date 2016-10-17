@@ -54,8 +54,8 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 	JComboBox report_type;
 
-	String[] e_columnNames = { "Date", "kWh", "Amount" };
-	String[] w_columnNames = { "Date", "Cubic Meters", "Amount" };
+	String[] e_columnNames = { "#", "Date", "kWh", "Amount" };
+	String[] w_columnNames = { "#","Date", "Cubic Meters", "Amount" };
 	String[] report_types = { "Monthly", "Yearly" };
 
 	MainWindow mw;
@@ -65,11 +65,8 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 		this.mw = mw;
 
-		if(mw.e_data.size() > 0) { e_id = Integer.parseInt(mw.e_data.get(mw.e_data.size()-1)[0]) + 1;}
-		else e_id = 1;
-
-		if(mw.w_data.size() > 0) { w_id = Integer.parseInt(mw.w_data.get(mw.w_data.size()-1)[0]) + 1;}
-		else w_id = 1;
+		e_id = mw.e_model.getNextRowNum();
+		w_id = mw.w_model.getNextRowNum();
 
 		store_id = store_data[0];
 		store_name = store_data[1];
@@ -199,14 +196,14 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 		for (String[] e : mw.e_data){
 			if(e[1].equals(store_id)){
-				String[] entry = {e[2], e[3], e[5]};
+				String[] entry = {e[0],e[2], e[3], e[5]};
 				e_tableModel.addRow(entry);
 			}
 		}
 
 		for (String[] w : mw.w_data){
 			if(w[1].equals(store_id)){
-				String[] entry = {w[2], w[3], w[5]};
+				String[] entry = {w[0],w[2], w[3], w[5]};
 				w_tableModel.addRow(entry);
 			}
 		}
@@ -258,8 +255,7 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 		} else if (e.getActionCommand().equals(" Delete ")) {
 			if (e_row != -1) {
-				mw.e_model.remove((Integer) e_tableModel.getValueAt(e_row, 0));
-				mw.e_data.remove(e_row);
+				mw.e_model.remove(e_row);
 				e_tableModel.removeRow(e_row);
 			} else {
 				JOptionPane.showMessageDialog(null, "Select a row first.");
@@ -277,8 +273,7 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 		} else if (e.getActionCommand().equals("Delete")) {
 			if (w_row != -1) {
-				mw.w_model.remove((Integer) w_tableModel.getValueAt(w_row, 0));
-				mw.w_data.remove(w_row);
+				mw.w_model.remove(w_row);
 				w_tableModel.removeRow(w_row);
 			} else {
 
