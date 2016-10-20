@@ -5,6 +5,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -36,9 +40,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 @SuppressWarnings("serial")
 public class MainWindow extends JPanel implements ActionListener {
-	public static String[] sectionList = { "ALL SECTIONS", "1ST FLOOR", "2ND FLOOR",
-    "MEAT", "FOOD", "CHICKEN", "FISH",	"VEGETABLE", "FRUIT", "GROCERY",
-    "SPECIAL", "MOBILE" };
+	public static String[] sectionList = { "ALL SECTIONS", "1ST FLOOR", "2ND FLOOR", "MEAT", "FOOD", "CHICKEN", "FISH",	"VEGETABLE", "FRUIT", "GROCERY", "SPECIAL", "MOBILE" };
 
 	int WIDTH = 800;
 	int HEIGHT = 600;
@@ -70,14 +72,13 @@ public class MainWindow extends JPanel implements ActionListener {
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-				| UnsupportedLookAndFeelException e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		JFrame f = new JFrame("Marikina Public Market Electricity and Water Database");
 		f.setSize(800, 600);
-
 		f.add(new MainWindow());
 
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -122,22 +123,48 @@ public class MainWindow extends JPanel implements ActionListener {
 		sections.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i, compWidth, compHeight);
 		sections.addItemListener(new ItemListener() {
         	public void itemStateChanged(ItemEvent ie) {
-            	updateTable(String.valueOf(sections.getSelectedItem()));
+            	updateTable(data);
         	}
     	});
 
 		searchfield = new JTextField("", 255);
 		searchfield.setBounds(padding, padding, WIDTH - padding * 2, compHeight);
-		searchfield.addActionListener(this);
-
-		updateTable("");
-
+		searchfield.addFocusListener(new FocusListener(){
+			public void focusGained(FocusEvent f) {
+        		searchfield.setText("");
+        		searchfield.setForeground(Color.BLACK);
+    		}
+			public void focusLost(FocusEvent f) {
+        		searchfield.setText("Search Store");
+        		searchfield.setForeground(Color.GRAY);
+    		}
+		});	
+		searchfield.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent k){
+				int ke = k.getKeyCode();
+				if(ke == KeyEvent.VK_ENTER || ke == KeyEvent.VK_BACK_SPACE){
+					String search_item = searchfield.getText();
+					ArrayList<String[]> temp_data = new ArrayList();
+					for(String[] d : data) if(d[2].toLowerCase().startsWith(search_item.toLowerCase())) temp_data.add(d);
+					updateTable(temp_data);
+					revalidate();
+				}
+			}
+			public void keyTyped(KeyEvent k){
+				String search_item = searchfield.getText();
+				ArrayList<String[]> temp_data = new ArrayList();
+				for(String[] d : data) if (d[2].toLowerCase().startsWith(search_item.toLowerCase())) temp_data.add(d);
+				updateTable(temp_data);
+				revalidate();
+			}
+			public void keyReleased(KeyEvent k){}
+		});
+		
 		list = new JTable() {
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
 		};
-
 		list.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent me) {
 				JTable table = (JTable) me.getSource();
@@ -149,13 +176,14 @@ public class MainWindow extends JPanel implements ActionListener {
 				}
 			}
 		});
-
 		list.setModel(tableModel);
 		MatteBorder b = new MatteBorder(1, 1, 1, 1, Color.BLACK);
 		list.setBorder(b);
 
 		tablesp = new JScrollPane(list);
 		tablesp.setBounds(padding, padding + compPadding + compHeight, WIDTH - padding * 2 - compWidth - compPadding, HEIGHT - padding * 3 - compPadding * 2 - compHeight);
+
+		updateTable(data);
 
 		add(add);
 		add(settings);
@@ -189,11 +217,12 @@ public class MainWindow extends JPanel implements ActionListener {
 	    w_maintenancecharge = m;
 	}
 
-	public void updateTable(String s){	
+	public void updateTable(ArrayList<String[]> data){	
+		String s = String.valueOf(sections.getSelectedItem());
 		tableModel.setRowCount(0);
-		if(String.valueOf(sections.getSelectedItem()).equals("ALL SECTIONS")){
+		if(s.equals("ALL SECTIONS")){
 			for(String[] d : data) tableModel.addRow(d);
-				
+
 		} else {
 			for(String[] d : data) {
 				if(d[1].equals(s))tableModel.addRow(d);

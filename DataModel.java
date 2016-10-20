@@ -175,7 +175,7 @@ public enum DataModel {
   public static boolean isRowEmpty(Row row) {
     for (int c = row.getFirstCellNum(); c < row.getLastCellNum(); c++) {
         Cell cell = row.getCell(c);
-        if (cell != null && cell.getCellType() != Cell.CELL_TYPE_BLANK && !cell.getStringCellValue().equals(""))
+        if (!cell.getStringCellValue().equals(""))
             return false;
     }
     return true;

@@ -20,6 +20,8 @@ public class AddStoreWindow extends JPanel implements ActionListener {
 	final int WIDTH = 500;
 	final int HEIGHT = 300;
 
+	String sectionl;
+
 	JLabel section, holder, name, id, iddisp;
 	JLabel[] labels = new JLabel[4];
 
@@ -76,7 +78,7 @@ public class AddStoreWindow extends JPanel implements ActionListener {
 		System.arraycopy(MainWindow.sectionList, 1, sectionList, 0, MainWindow.sectionList.length - 1);
 		sectionsircb = new JComboBox(sectionList);
 		sectionsircb.setBounds(padding + compWidth + compPadding, padding + compPadding + compHeight, compWidth + 40, compHeight);
-		String sectionl = String.valueOf(mw.sections.getSelectedItem());
+		sectionl = String.valueOf(mw.sections.getSelectedItem());
 		if(!sectionl.equals("ALL SECTIONS")) sectionsircb.setSelectedItem(sectionl);
 
 		nametf = new JTextField(25);
@@ -102,11 +104,14 @@ public class AddStoreWindow extends JPanel implements ActionListener {
 		if (ae.getActionCommand().equalsIgnoreCase("Cancel")) {
 			f.dispose();
 		} else if (ae.getActionCommand().equalsIgnoreCase("Add")) {
-			String[] entry = {Integer.toString(store_id), sectionsircb.getSelectedItem().toString(), nametf.getText(), holdertf.getText()};
+			String selected_section = String.valueOf(sectionsircb.getSelectedItem());
+			if(!sectionl.equals("ALL SECTIONS")) mw.sections.setSelectedItem(selected_section);
+
+			String[] entry = {Integer.toString(store_id), selected_section, nametf.getText(), holdertf.getText()};
 			mw.model.add(entry);
 			mw.tableModel.addRow(entry);
-			mw.revalidate();
 			mw.lastId++;
+			mw.revalidate();
 			f.dispose();
 		}
 	}

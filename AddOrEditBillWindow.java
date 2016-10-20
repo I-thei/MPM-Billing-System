@@ -158,7 +158,6 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 					e_entry = new String[]{Integer.toString(sbw.e_id), sbw.store_id, datePicker.getJFormattedTextField().getText(), input.getText(), Double.toString(sbw.mw.e_kwh), getElectricityAmount()};
 					entry = new String[]{e_entry[0],e_entry[2], e_entry[3], e_entry[5]};
 					sbw.mw.e_model.edit(sbw.e_id, e_entry);
-					System.out.println(sbw.e_id + " " + entry[0]);
 					sbw.e_tableModel.setValueAt(entry[1], sbw.e_row, 1);
 					sbw.e_tableModel.setValueAt(entry[2], sbw.e_row, 2);
 					sbw.e_tableModel.setValueAt(entry[3], sbw.e_row, 3);
