@@ -38,8 +38,10 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 	int e_id, w_id;
 	String store_id, store_section, store_name, store_holder;
 
+	ArrayList<String[]> e_data, w_data;
+
 	DefaultTableModel e_tableModel = new DefaultTableModel();
-	DefaultTableModel w_tableModel = new DefaultTableModel();
+	DefaultTableModel w_tableModel = new DefaultTableModel(); 
 
 	JLabel idl, namel, sectionl, holderl, e_records, w_records;
 	JLabel[] labels = new JLabel[4];
@@ -48,7 +50,7 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 	JFrame f;
 
-	JButton generate, e_add, e_edit, e_delete, w_add, w_edit, w_delete;
+	JButton generate, e_add, e_delete, w_add, w_delete;
 	JButton[] e_buttons = new JButton[3];
 	JButton[] w_buttons = new JButton[3];
 
@@ -167,48 +169,70 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		add(generate);
 
 		e_add = new JButton(" Add ");
-		e_edit = new JButton(" Edit ");
-		e_delete = new JButton(" Delete ");
-		e_buttons[0] = e_add;
-		e_buttons[1] = e_edit;
-		e_buttons[2] = e_delete;
+		e_add.setBounds(WIDTH - padding + compPadding / 2 - buttonWidth, e_table_y, buttonWidth - 10, compHeight);
+		e_add.addActionListener(this);
+		add(e_add);
 
-		for (int i = 0; i < e_buttons.length; i++) {
-			e_buttons[i].setBounds(WIDTH - padding + compPadding / 2 - buttonWidth,
-					e_table_y + compHeight * i + compPadding * i, buttonWidth - 10, compHeight);
-			e_buttons[i].addActionListener(this);
-			add(e_buttons[i]);
-		}
+		e_delete = new JButton(" Delete ");
+		e_delete.setBounds(WIDTH - padding + compPadding / 2 - buttonWidth, e_table_y + compHeight + compPadding , buttonWidth - 10, compHeight);
+		e_delete.addActionListener(this);
+		e_delete.setEnabled(false);
+		add(e_delete);
+
 
 		w_add = new JButton("Add");
-		w_edit = new JButton("Edit");
+		w_add.setBounds(WIDTH - padding + compPadding / 2 - buttonWidth, w_table_y, buttonWidth - 10, compHeight);
+		w_add.addActionListener(this);
+		add(w_add);
+
+
 		w_delete = new JButton("Delete");
-		w_buttons[0] = w_add;
-		w_buttons[1] = w_edit;
-		w_buttons[2] = w_delete;
+		w_delete.setBounds(WIDTH - padding + compPadding / 2 - buttonWidth, w_table_y + compHeight + compPadding , buttonWidth - 10, compHeight);
+		w_delete.addActionListener(this);
+		w_delete.setEnabled(false);
+		add(w_delete);
 
-		for (int i = 0; i < e_buttons.length; i++) {
-			w_buttons[i].setBounds(WIDTH - padding + compPadding / 2 - buttonWidth,
-					w_table_y + compHeight * i + compPadding * i, buttonWidth - 10, compHeight);
-			w_buttons[i].addActionListener(this);
-			add(w_buttons[i]);
-		}
-
-		for (String[] e : mw.e_data){
-			if(e[1].equals(store_id)){
-				String[] entry = {e[0],e[2], e[3], e[5]};
-				e_tableModel.addRow(entry);
+		for(String[] e : mw.e_data){
+			if (e[1].equals(store_id)){
+					String[] entry = {e[0], e[2], e[3], e[5]};
+					e_tableModel.addRow(entry);
 			}
 		}
 
-		for (String[] w : mw.w_data){
-			if(w[1].equals(store_id)){
-				String[] entry = {w[0],w[2], w[3], w[5]};
+		for(String[] w : mw.w_data){
+			if (w[1].equals(store_id)){
+				String[] entry = {w[0],w[2], w[3], w[9]};
 				w_tableModel.addRow(entry);
-			}
+			} 
 		}
 
-		checkLists();
+		e_table.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent me) {
+				JTable table = (JTable) me.getSource();
+				Point p = me.getPoint();
+				int row = table.rowAtPoint(p);
+				int column = table.columnAtPoint(p);
+				if (me.getClickCount() == 2 && row != -1) {
+					createEditWindow(e_data, e_row, "elec");
+				}
+				e_delete.setEnabled(true);
+			}
+		});
+
+		w_table.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent me) {
+				JTable table = (JTable) me.getSource();
+				Point p = me.getPoint();
+				int row = table.rowAtPoint(p);
+				int column = table.columnAtPoint(p);
+				if (me.getClickCount() == 2 && row != -1) {
+					createEditWindow(w_data, w_row, "water");
+				}
+				w_delete.setEnabled(true);
+			}
+		});
+
+		updateData();
 
 		f.setResizable(false);
 		f.add(this);
@@ -216,27 +240,22 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 	}
 
 
-	public void checkLists() {
-
-		if (mw.e_data.size() <= 0) {
-
-			e_buttons[1].setEnabled(false);
-			e_buttons[2].setEnabled(false);
-		} else {
-
-			e_buttons[1].setEnabled(true);
-			e_buttons[2].setEnabled(true);
+	public void updateData(){
+		e_data  = new ArrayList<>();
+		for(String[] e : mw.e_data){
+			if (e[1].equals(store_id)) e_data.add(e);
 		}
 
-		if (mw.w_data.size() <= 0) {
-
-			w_buttons[1].setEnabled(false);
-			w_buttons[2].setEnabled(false);
-		} else {
-
-			w_buttons[1].setEnabled(true);
-			w_buttons[2].setEnabled(true);
+		w_data = new ArrayList<>();
+		for(String[] w : mw.w_data){
+			if (w[1].equals(store_id))w_data.add(w);
 		}
+	}
+
+	public AddOrEditBillWindow createEditWindow(ArrayList<String[]> data, int row, String s){
+		boolean bool = false;
+		if (s.equals("elec")){bool = true;}
+		return new AddOrEditBillWindow(this, bool, "edit", data.get(row));
 	}
 
 
@@ -244,46 +263,31 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 
 		if (e.getActionCommand().equals(" Add ")) {
-			new AddOrEditBillWindow(this, true, true, null);
-
-		} else if (e.getActionCommand().equals(" Edit ")) {
-			if (e_row != -1) {
-				new AddOrEditBillWindow(this, true, false, mw.e_data.get(e_row));
-			} else {
-				JOptionPane.showMessageDialog(null, "Select a row first.");
-			}
-
-		} else if (e.getActionCommand().equals(" Delete ")) {
-			if (e_row != -1) {
-				mw.e_model.remove(e_row);
-				e_tableModel.removeRow(e_row);
-			} else {
-				JOptionPane.showMessageDialog(null, "Select a row first.");
-			}
+			new AddOrEditBillWindow(this, true, "add", null);
 
 		} else if (e.getActionCommand().equals("Add")) {
-			new AddOrEditBillWindow(this, false, true, null);
+			new AddOrEditBillWindow(this, false, "add", null);
+		
+		} else if (e.getActionCommand().equals(" Delete ")) {
+			int[] selected = e_table.getSelectedRows();
+			for (int i : selected) {
+				mw.e_model.remove(Integer.parseInt(e_data.remove(e_row)[0]));
+				e_tableModel.removeRow(e_row);
 
-		} else if (e.getActionCommand().equals("Edit")) {
-			if (w_row != -1) {
-				new AddOrEditBillWindow(this, false, false, mw.w_data.get(w_row));
-			} else {
-				JOptionPane.showMessageDialog(null, "Select a row first.");
 			}
+			e_delete.setEnabled(false);
 
 		} else if (e.getActionCommand().equals("Delete")) {
-			if (w_row != -1) {
-				mw.w_model.remove(w_row);
+			int[] selected = w_table.getSelectedRows();
+			for (int i : selected) {
+				mw.w_model.remove(Integer.parseInt(w_data.remove(w_row)[0]));
 				w_tableModel.removeRow(w_row);
-			} else {
-
-				JOptionPane.showMessageDialog(null, "Select a row first.");
 			}
+			w_delete.setEnabled(false);
 		}
 
 		revalidate();
 		updateUI();
-		checkLists();
 	}
 	
 	

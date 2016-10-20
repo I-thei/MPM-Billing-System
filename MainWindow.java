@@ -46,8 +46,12 @@ public class MainWindow extends JPanel implements ActionListener {
 	int padding = 25;
 	
 	int lastId = 1;
-	double evat = 12;
-	double echarge = 12;
+	double e_kwh = 8.0;
+	double w_firstTenCubic= 314.33;
+	double w_remainingCubic = 31.47;
+	double w_echarge = 12;
+	double w_evat= 12;
+	double w_maintenancecharge= 6;
 	
  	DataModel model, e_model, w_model;
 	ArrayList<String[]> data, e_data, w_data;
@@ -120,7 +124,7 @@ public class MainWindow extends JPanel implements ActionListener {
 		searchfield.addActionListener(this);
 
 		for(String[] d : data){
-			tableModel.addRow(d);
+				if(!d[0].equals(""))tableModel.addRow(d);
 		}
 
 		list = new JTable() {
@@ -146,9 +150,7 @@ public class MainWindow extends JPanel implements ActionListener {
 		list.setBorder(b);
 
 		tablesp = new JScrollPane(list);
-		tablesp.setBounds(padding, padding + compPadding + compHeight,
-      WIDTH - padding * 2 - compWidth - compPadding,
-			HEIGHT - padding * 3 - compPadding * 2 - compHeight);
+		tablesp.setBounds(padding, padding + compPadding + compHeight, WIDTH - padding * 2 - compWidth - compPadding, HEIGHT - padding * 3 - compPadding * 2 - compHeight);
 
 		add(add);
 		add(settings);
@@ -173,9 +175,13 @@ public class MainWindow extends JPanel implements ActionListener {
 		return new StoreBillWindow(this, data.get(row));
 	}
 
-	public void setSettings(double v, double c) {
-    evat = v;
-    echarge = c;
+	public void setSettings(double w, double f, double r, double v, double c, double m) {
+	    e_kwh = w;
+	    w_firstTenCubic = f;
+	    w_remainingCubic = r;
+	    w_echarge = c;
+	    w_evat = v;
+	    w_maintenancecharge = m;
 	}
 
 }

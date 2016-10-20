@@ -12,9 +12,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public enum DataModel {
   Stores(new String[]{"ID", "Section", "Name", "Holder"}),
   Electric(new String[]{"ID", "Store ID", "Date", "kWh", "Rate", "Amount"}),
-  Water(new String[]{"ID", "Store ID", "Date", "Cubic meters", "Rate", "Amount"}),
-  Settings(new String[]{"ID", "Value"});
-  
+  Water(new String[]{"ID", "Store ID", "Date", "Cubic meters", "Rate: First 10", "Rate: Remaining Cubic", "Environmental Charge", "E-Vat", "Maintenance Charge", "Amount"});
+
+
   private final static String DIRECTORY = "";
   private final static String FILENAME = "data.xlsx";
   private static XSSFWorkbook workbook = null;
@@ -45,7 +45,6 @@ public enum DataModel {
         System.out.println("Workbook");
         for (DataModel d : DataModel.values()) {
           Sheet sheet = workbook.createSheet(d.name());
-
           Row dataRow = sheet.createRow(0);
           String[] attrs = d.getAttributes();
           int i = 0;
@@ -53,15 +52,6 @@ public enum DataModel {
             dataRow.createCell(i).setCellValue(s);
             i++;
           } 
-
-          if (d.name() == "Settings") {
-            Row echarge = sheet.createRow(1);
-            Row evat = sheet.createRow(2);
-            echarge.createCell(0).setCellValue("1");
-            echarge.createCell(1).setCellValue(ECHARGE);
-            evat.createCell(0).setCellValue("2");
-            evat.createCell(1).setCellValue(EVAT);
-          }
         }
         _write();
 
@@ -97,7 +87,7 @@ public enum DataModel {
   }
 
   private void _getData() {
-    if (data.size() > 1) return;
+    if (data.size() > 0) return;
     Sheet sheet = workbook.getSheet(name());
     Iterator<Row> ri = sheet.iterator();
     ri.next();
@@ -118,7 +108,7 @@ public enum DataModel {
   }
 
   public boolean _edit(int id, String[] s) {
-    if (_checkInstance()) _getData();
+    _checkInstance();
     Sheet sheet = workbook.getSheet(name());
     Row temp = sheet.createRow(id);
     for (int i = 0; i < length; i++) {
@@ -132,7 +122,7 @@ public enum DataModel {
   }
 
   public boolean add(String[] s) {
-    int id = workbook.getSheet(name()).getLastRowNum() + 1;
+    int id = getNextRowNum();
     String[] temp = new String[s.length + 1];
     temp[0] = Integer.toString(id);
     System.arraycopy(s, 0, temp, 1, s.length);
@@ -141,15 +131,22 @@ public enum DataModel {
   }
 
   public boolean edit(int id, String[] s) {
-    int _id = Integer.parseInt(data.get(id)[0]);
-    data.set(id, s);
-    return _edit(_id, s);
+    data.set(dataIndex(id), s);
+    return _edit(id, s);
   }
 
   public boolean remove(int id) {
-    if (name() == "Stores" || name() == "Settings") return false;
-    int _id = Integer.parseInt(data.remove(id)[0]);
+    if (name() == "Stores") return false;
+    int _id = Integer.parseInt(data.remove(dataIndex(id))[0]);
     return _edit(_id, new String[]{"-1"});
+  }
+
+  public int dataIndex(int id) {
+    int i = 0;
+    while(!data.get(i)[0].equals(Integer.toString(id))){
+      i++;
+    }
+    return i;
   }
 
   public ArrayList<String[]> getAll() {
@@ -182,7 +179,7 @@ public enum DataModel {
             return false;
     }
     return true;
-}
+  }
 
   public int getNextRowNum() {
     int id = workbook.getSheet(name()).getLastRowNum() + 1;
