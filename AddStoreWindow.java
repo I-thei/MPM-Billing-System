@@ -101,9 +101,7 @@ public class AddStoreWindow extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		if (ae.getActionCommand().equalsIgnoreCase("Cancel")) {
-			f.dispose();
-		} else if (ae.getActionCommand().equalsIgnoreCase("Add")) {
+		if (ae.getActionCommand().equalsIgnoreCase("Add")) {
 			String selected_section = String.valueOf(sectionsircb.getSelectedItem());
 			if(!sectionl.equals("ALL SECTIONS")) mw.sections.setSelectedItem(selected_section);
 
@@ -111,9 +109,9 @@ public class AddStoreWindow extends JPanel implements ActionListener {
 			mw.model.add(entry);
 			mw.tableModel.addRow(entry);
 			mw.lastId++;
-			mw.revalidate();
-			f.dispose();
+			mw.revalidate();	
 		}
+		f.dispose();
 	}
 
 }

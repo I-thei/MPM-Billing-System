@@ -130,6 +130,8 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 				JTable table = (JTable) me.getSource();
 				Point p = me.getPoint();
 				e_row = table.rowAtPoint(p);
+				if(me.getClickCount() == 2 && e_row != -1) createEditWindow(e_data, e_row, "elec");
+				e_delete.setEnabled(true);
 			}
 		});
 
@@ -144,7 +146,9 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 			public void mousePressed(MouseEvent me) {
 				JTable table = (JTable) me.getSource();
 				Point p = me.getPoint();
-				w_row = table.rowAtPoint(p);
+				w_row = table.rowAtPoint(p);;
+				if(me.getClickCount() == 2 && w_row != -1) createEditWindow(w_data, w_row, "water");
+				w_delete.setEnabled(true);
 			}
 		});
 
@@ -206,50 +210,15 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 			} 
 		}
 
-		e_table.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent me) {
-				JTable table = (JTable) me.getSource();
-				Point p = me.getPoint();
-				int row = table.rowAtPoint(p);
-				int column = table.columnAtPoint(p);
-				if (me.getClickCount() == 2 && row != -1) {
-					createEditWindow(e_data, e_row, "elec");
-				}
-				e_delete.setEnabled(true);
-			}
-		});
-
-		w_table.addMouseListener(new MouseAdapter() {
-			public void mousePressed(MouseEvent me) {
-				JTable table = (JTable) me.getSource();
-				Point p = me.getPoint();
-				int row = table.rowAtPoint(p);
-				int column = table.columnAtPoint(p);
-				if (me.getClickCount() == 2 && row != -1) {
-					createEditWindow(w_data, w_row, "water");
-				}
-				w_delete.setEnabled(true);
-			}
-		});
-
-		updateData();
-
+		e_data  = new ArrayList<>();
+		for(String[] e : mw.e_data) if(e[1].equals(store_id)) e_data.add(e);
+		
+		w_data = new ArrayList<>();
+		for(String[] w : mw.w_data) if(w[1].equals(store_id))w_data.add(w);
+		
 		f.setResizable(false);
 		f.add(this);
 		f.setVisible(true);
-	}
-
-
-	public void updateData(){
-		e_data  = new ArrayList<>();
-		for(String[] e : mw.e_data){
-			if (e[1].equals(store_id)) e_data.add(e);
-		}
-
-		w_data = new ArrayList<>();
-		for(String[] w : mw.w_data){
-			if (w[1].equals(store_id))w_data.add(w);
-		}
 	}
 
 	public AddOrEditBillWindow createEditWindow(ArrayList<String[]> data, int row, String s){
@@ -273,7 +242,6 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 			for (int i : selected) {
 				mw.e_model.remove(Integer.parseInt(e_data.remove(e_row)[0]));
 				e_tableModel.removeRow(e_row);
-
 			}
 			e_delete.setEnabled(false);
 

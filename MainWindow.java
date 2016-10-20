@@ -142,21 +142,13 @@ public class MainWindow extends JPanel implements ActionListener {
 		searchfield.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent k){
 				int ke = k.getKeyCode();
-				if(ke == KeyEvent.VK_ENTER || ke == KeyEvent.VK_BACK_SPACE){
-					String search_item = searchfield.getText();
-					ArrayList<String[]> temp_data = new ArrayList();
-					for(String[] d : data) if(d[2].toLowerCase().startsWith(search_item.toLowerCase())) temp_data.add(d);
-					updateTable(temp_data);
-					revalidate();
-				}
+				if(ke == KeyEvent.VK_ENTER || ke == KeyEvent.VK_BACK_SPACE) search(searchfield.getText());
 			}
+
 			public void keyTyped(KeyEvent k){
-				String search_item = searchfield.getText();
-				ArrayList<String[]> temp_data = new ArrayList();
-				for(String[] d : data) if (d[2].toLowerCase().startsWith(search_item.toLowerCase())) temp_data.add(d);
-				updateTable(temp_data);
-				revalidate();
+				search(searchfield.getText());
 			}
+
 			public void keyReleased(KeyEvent k){}
 		});
 		
@@ -217,16 +209,21 @@ public class MainWindow extends JPanel implements ActionListener {
 	    w_maintenancecharge = m;
 	}
 
+	public void search(String search_item){
+		ArrayList<String[]> temp_data = new ArrayList<String[]>();
+		for(String[] d : data) if(d[2].toLowerCase().startsWith(search_item.toLowerCase())) temp_data.add(d);
+		updateTable(temp_data);
+		revalidate();
+	}
+
 	public void updateTable(ArrayList<String[]> data){	
 		String s = String.valueOf(sections.getSelectedItem());
 		tableModel.setRowCount(0);
-		if(s.equals("ALL SECTIONS")){
+		if(s.equals("ALL SECTIONS")) {
 			for(String[] d : data) tableModel.addRow(d);
 
 		} else {
-			for(String[] d : data) {
-				if(d[1].equals(s))tableModel.addRow(d);
-			}
+			for(String[] d : data) if(d[1].equals(s)) tableModel.addRow(d);
 		}
 	}
 
