@@ -3,6 +3,8 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -118,14 +120,17 @@ public class MainWindow extends JPanel implements ActionListener {
 
 		sections = new JComboBox(sectionList);
 		sections.setBounds(WIDTH - compWidth - padding, padding + compHeight * i + compPadding * i, compWidth, compHeight);
+		sections.addItemListener(new ItemListener() {
+        	public void itemStateChanged(ItemEvent ie) {
+            	updateTable(String.valueOf(sections.getSelectedItem()));
+        	}
+    	});
 
 		searchfield = new JTextField("", 255);
 		searchfield.setBounds(padding, padding, WIDTH - padding * 2, compHeight);
 		searchfield.addActionListener(this);
 
-		for(String[] d : data){
-				if(!d[0].equals(""))tableModel.addRow(d);
-		}
+		updateTable("");
 
 		list = new JTable() {
 			public boolean isCellEditable(int row, int column) {
@@ -182,6 +187,18 @@ public class MainWindow extends JPanel implements ActionListener {
 	    w_echarge = c;
 	    w_evat = v;
 	    w_maintenancecharge = m;
+	}
+
+	public void updateTable(String s){	
+		tableModel.setRowCount(0);
+		if(String.valueOf(sections.getSelectedItem()).equals("ALL SECTIONS")){
+			for(String[] d : data) tableModel.addRow(d);
+				
+		} else {
+			for(String[] d : data) {
+				if(d[1].equals(s))tableModel.addRow(d);
+			}
+		}
 	}
 
 }

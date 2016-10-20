@@ -122,9 +122,12 @@ public class SettingsWindow extends JPanel implements ActionListener {
 		if (ae.getActionCommand().equalsIgnoreCase("Set")) {
 			try {
 				mw.setSettings(
-					Double.parseDouble(e_kwhInput.getText()), Double.parseDouble(w_firstTenCubicInput.getText()),
-					Double.parseDouble(w_remainingCubicInput.getText()), Double.parseDouble(w_echargeInput.getText()),
-					Double.parseDouble(w_evatInput.getText()), Double.parseDouble(w_maintenancechargeInput.getText()));
+					Double.parseDouble(e_kwhInput.getText()), 
+					Double.parseDouble(w_firstTenCubicInput.getText()),
+					Double.parseDouble(w_remainingCubicInput.getText()), 
+					Double.parseDouble(w_echargeInput.getText()),
+					Double.parseDouble(w_evatInput.getText()), 
+					Double.parseDouble(w_maintenancechargeInput.getText()));
 				f.dispose();
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(null, "Enter valid inputs");
