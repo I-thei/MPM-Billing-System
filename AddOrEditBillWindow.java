@@ -26,7 +26,7 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 	final int WIDTH = 260;
 	final int HEIGHT = 260;
 
-	int row;
+	int row, id;
 	boolean elec, add;
 	DataModel model;
 	DefaultTableModel tableModel;
@@ -79,11 +79,13 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
  
 		switch (action){
 			case "add":
+				id = model.getNextRowNum();
 				addoredit = "Add";
 				this.add = true;
 				add_edit_command = "Add " + type;
 				break;
 			case "edit":
+				id = Integer.parseInt(data.get(row)[0]);
 				addoredit = "Set";
 				isDelete = "Delete";
 				cancel_delete_command = "Delete " + type;
@@ -157,7 +159,7 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 
 	public String[] getElecValues(){
 		return new String[]{
-			Integer.toString(sbw.e_id), 
+			Integer.toString(id), 
 			sbw.store_id, 
 			datePicker.getJFormattedTextField().getText(), 
 			input.getText(), 
@@ -167,7 +169,7 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 
 	public String[] getWaterValues(){
 		return new String[] {
-			Integer.toString(sbw.w_id), 
+			Integer.toString(id), 
 			sbw.store_id, datePicker.getJFormattedTextField().getText(), 
 			input.getText(), Double.toString(sbw.mw.w_firstTenCubic), 
 			Double.toString(sbw.mw.w_remainingCubic), 
@@ -193,7 +195,7 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
  		return String.format("%.2f", amount);
  	}
 
-	public void doAction(String action, String type, int id){
+	public void doAction(String action, String type){
 		String[] entry = null;
 		String[] table_entry = null;
 
@@ -235,33 +237,29 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 		}
 		switch(actioncommand){
 			case "Delete Water":
-				doAction("delete", "water", sbw.e_id);
+				doAction("delete", "water");
 				sbw.w_delete.setEnabled(false);
 				break;
 
 			case "Delete Elec":
-				doAction("delete", "elec", sbw.w_id);
+				doAction("delete", "elec");
 				sbw.e_delete.setEnabled(false);
 				break;
 
 			case "Add Water":
-				sbw.w_id = sbw.mw.w_model.getNextRowNum();
-				doAction("add", "water", sbw.w_id);
+				doAction("add", "water");
 				break;
 
 			case "Edit Water":
-				sbw.w_id = Integer.parseInt(sbw.w_data.get(sbw.w_row)[0]);
-				doAction("edit", "water", sbw.w_id);
+				doAction("edit", "water");
 				break;
 
 			case "Add Elec":
-				sbw.e_id = sbw.mw.e_model.getNextRowNum();
-				doAction("add",  "elec",  sbw.e_id);
+				doAction("add",  "elec");
 				break;
 
 			case "Edit Elec":
-				sbw.e_id = Integer.parseInt(sbw.e_data.get(sbw.e_row)[0]);
-				doAction("edit", "elec", sbw.e_id);
+				doAction("edit", "elec");
 				break;
 		}
 		sbw.revalidate();

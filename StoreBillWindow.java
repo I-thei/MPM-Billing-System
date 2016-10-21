@@ -36,7 +36,6 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 	static final int WIDTH = 780;
 	static final int HEIGHT = 560;
 
-	int e_id, w_id;
 	String store_id, store_section, store_name, store_holder;
 
 	ArrayList<String[]> e_data, w_data;
@@ -67,9 +66,6 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 	public StoreBillWindow(MainWindow mw, String[] store_data) {
 
 		this.mw = mw;
-
-		e_id = mw.e_model.getNextRowNum();
-		w_id = mw.w_model.getNextRowNum();
 
 		store_id = store_data[0];
 		store_name = store_data[1];
