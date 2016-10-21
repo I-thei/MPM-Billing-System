@@ -1,6 +1,5 @@
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
+import java.nio.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import org.apache.poi.ss.usermodel.Cell;
@@ -33,8 +32,8 @@ public enum DataModel {
   }
 
   public static boolean initialize() {
-    try {
-      FileInputStream in = new FileInputStream(new File(DIRECTORY + FILENAME));
+    try {     
+      FileInputStream in = new FileInputStream(new File(DIRECTORY+FILENAME));
       workbook = new XSSFWorkbook(in);
       Sheet  sheet = workbook.getSheetAt(0);
       return true;

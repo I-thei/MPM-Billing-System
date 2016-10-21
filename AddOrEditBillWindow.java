@@ -239,7 +239,7 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 				doAction("delete", "water");
 				sbw.w_delete.setEnabled(false);
 				break;
-
+				
 			case "Delete Elec":
 				doAction("delete", "elec");
 				sbw.e_delete.setEnabled(false);
@@ -250,7 +250,7 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 				break;
 
 			case "Elec":
-				doAction(action,  "elec");
+				doAction(action, "elec");
 				break;
 
 		}
