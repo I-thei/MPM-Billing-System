@@ -199,25 +199,22 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		w_delete.setActionCommand("Delete Water");
 		add(w_delete);
 
+		e_data  = new ArrayList<>();
 		for(String[] e : mw.e_data){
 			if (e[1].equals(store_id)){
+					e_data.add(e);
 					String[] entry = {e[0], e[2], e[3], e[5]};
 					e_tableModel.addRow(entry);
 			}
 		}
-
+		w_data = new ArrayList<>();
 		for(String[] w : mw.w_data){
 			if (w[1].equals(store_id)){
+				w_data.add(w);
 				String[] entry = {w[0],w[2], w[3], w[9]};
 				w_tableModel.addRow(entry);
 			} 
 		}
-
-		e_data  = new ArrayList<>();
-		for(String[] e : mw.e_data) if(e[1].equals(store_id)) e_data.add(e);
-
-		w_data = new ArrayList<>();
-		for(String[] w : mw.w_data) if(w[1].equals(store_id))w_data.add(w);
 		
 		f.setResizable(false);
 		f.add(this);

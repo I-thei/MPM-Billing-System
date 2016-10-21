@@ -26,7 +26,11 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 	final int WIDTH = 260;
 	final int HEIGHT = 260;
 
+	int row;
 	boolean elec, add;
+	DataModel model;
+	DefaultTableModel tableModel;
+	ArrayList<String[]> data;
 
 	String unit = "";
 	String action, add_edit_command, cancel_delete_command;
@@ -40,7 +44,7 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 
 	JTextField input;
 
-	UtilDateModel model;
+	UtilDateModel utilModel;
 	Properties p;
 	JDatePanelImpl datePanel;
 	JDatePickerImpl datePicker;
@@ -60,16 +64,23 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 		if(elec){ 
 			type = "Elec";
 			unit = "kW";
+			this.model = sbw.mw.e_model;
+			this.tableModel = sbw.e_tableModel;
+			this.data = sbw.e_data;
+			this.row = sbw.e_row;
 		} else { 
 			type = "Water"; 
 			unit = "Cubic Meters";
+			this.model = sbw.mw.w_model;
+			this.tableModel = sbw.w_tableModel;
+			this.data = sbw.w_data;
+			this.row = sbw.w_row;
 		}
  
 		switch (action){
 			case "add":
 				addoredit = "Add";
 				this.add = true;
-				cancel_delete_command = "Cancel";
 				add_edit_command = "Add " + type;
 				break;
 			case "edit":
@@ -94,16 +105,16 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 		kW_or_cm_l = new JLabel(unit);
 		kW_or_cm_l.setBounds(padding, padding + compPadding * 2 + compHeight * 2, 100, compHeight);
 
-		model = new UtilDateModel();
-		model.setDate(model.getYear(), model.getMonth(), model.getDay());
-		model.setSelected(true);
+		utilModel = new UtilDateModel();
+		utilModel.setDate(utilModel.getYear(), utilModel.getMonth(), utilModel.getDay());
+		utilModel.setSelected(true);
 
 		p = new Properties();
 		p.put("text.month", "Month");
 		p.put("text.today", "Today");
 		p.put("text.year", "Year");
 
-		datePanel = new JDatePanelImpl(model, p);
+		datePanel = new JDatePanelImpl(utilModel, p);
 		datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
 		datePicker.setBounds(padding, padding + compHeight + compPadding, 200, compHeight);
 
@@ -182,9 +193,10 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
  		return String.format("%.2f", amount);
  	}
 
-	public void doAction(String action, String type, DataModel model, DefaultTableModel tableModel, ArrayList<String[]> data, int row, int id){
+	public void doAction(String action, String type, int id){
 		String[] entry = null;
 		String[] table_entry = null;
+
 		try { 
 			if(type.equals("elec")){entry = getElecValues();
 			} else{ entry = getWaterValues(); }
@@ -223,31 +235,33 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 		}
 		switch(actioncommand){
 			case "Delete Water":
-				doAction("delete", "water", sbw.mw.w_model, sbw.w_tableModel, sbw.w_data, sbw.w_row, sbw.e_id);
+				doAction("delete", "water", sbw.e_id);
+				sbw.w_delete.setEnabled(false);
 				break;
 
 			case "Delete Elec":
-				doAction("delete", "elec", sbw.mw.e_model, sbw.e_tableModel, sbw.e_data, sbw.e_row, sbw.w_id);
+				doAction("delete", "elec", sbw.w_id);
+				sbw.e_delete.setEnabled(false);
 				break;
 
 			case "Add Water":
 				sbw.w_id = sbw.mw.w_model.getNextRowNum();
-				doAction("add", "water", sbw.mw.w_model, sbw.w_tableModel, sbw.w_data, sbw.w_row, sbw.w_id);
+				doAction("add", "water", sbw.w_id);
 				break;
 
 			case "Edit Water":
 				sbw.w_id = Integer.parseInt(sbw.w_data.get(sbw.w_row)[0]);
-				doAction("edit", "water", sbw.mw.w_model, sbw.w_tableModel,  sbw.w_data, sbw.w_row, sbw.w_id);
+				doAction("edit", "water", sbw.w_id);
 				break;
 
 			case "Add Elec":
 				sbw.e_id = sbw.mw.e_model.getNextRowNum();
-				doAction("add",  "elec", sbw.mw.e_model, sbw.e_tableModel, sbw.e_data, sbw.e_row, sbw.e_id);
+				doAction("add",  "elec",  sbw.e_id);
 				break;
 
 			case "Edit Elec":
 				sbw.e_id = Integer.parseInt(sbw.e_data.get(sbw.e_row)[0]);
-				doAction("edit", "elec", sbw.mw.e_model, sbw.e_tableModel, sbw.e_data, sbw.e_row, sbw.e_id);
+				doAction("edit", "elec", sbw.e_id);
 				break;
 		}
 		sbw.revalidate();
