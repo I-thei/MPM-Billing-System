@@ -29,7 +29,7 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 	boolean elec, add;
 
 	String unit = "";
-	String action;
+	String action, add_edit_command, cancel_delete_command;
 	String[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September","October", "November", "December" };
 	String[] entry, tableEntry;
 	JLabel date_l, kW_or_cm_l;
@@ -55,20 +55,33 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 
 		String addoredit = "";
 		String isDelete = "Cancel";
+		String type;
 
+		if(elec){ 
+			type = "Elec";
+			unit = "kW";
+		} else { 
+			type = "Water"; 
+			unit = "Cubic Meters";
+		}
+ 
 		switch (action){
 			case "add":
 				addoredit = "Add";
 				this.add = true;
+				cancel_delete_command = "Cancel";
+				add_edit_command = "Add " + type;
 				break;
 			case "edit":
 				addoredit = "Set";
-				if(elec) {isDelete = " Delete ";}
-					else {isDelete = "Delete";}
+				isDelete = "Delete";
+				cancel_delete_command = "Delete " + type;
+				add_edit_command = "Edit " + type;
 				break;
 		}
 
-		f = new JFrame(addoredit + " Bill");
+
+		f = new JFrame(add_edit_command + " Bill");
 		f.setSize(WIDTH, HEIGHT);
 		f.setLocationRelativeTo(null);
 
@@ -77,10 +90,6 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 
 		date_l = new JLabel("Date");
 		date_l.setBounds(padding, padding, 100, compHeight);
-
-		if (elec) {
-			unit = "kW";
-		} else {unit = "Cubic Meters";}
 
 		kW_or_cm_l = new JLabel(unit);
 		kW_or_cm_l.setBounds(padding, padding + compPadding * 2 + compHeight * 2, 100, compHeight);
@@ -105,10 +114,12 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 		add_or_edit = new JButton(addoredit);
 		add_or_edit.setBounds(padding, HEIGHT - padding * 2 - compHeight - compPadding, 80, compHeight);
 		add_or_edit.addActionListener(this);
+		add_or_edit.setActionCommand(add_edit_command);
 
 		cancel = new JButton(isDelete);
 		cancel.setBounds(WIDTH - padding - 80 - compPadding, HEIGHT - padding * 2 - compHeight - compPadding, 80, compHeight);
 		cancel.addActionListener(this);
+		cancel.setActionCommand(cancel_delete_command);
 
 		add(date_l);
 		add(kW_or_cm_l);
@@ -121,6 +132,7 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 		f.add(this);
 		f.setVisible(true);
 	}
+
 
 	public void setDateText() {
 		String date = datePicker.getJFormattedTextField().getText();
@@ -170,10 +182,16 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
  		return String.format("%.2f", amount);
  	}
 
+	public void doAction(String action, String type, DataModel model, DefaultTableModel tableModel, ArrayList<String[]> data, int row, int id){
+		String[] entry = null;
+		String[] table_entry = null;
+		try { 
+			if(type.equals("elec")){entry = getElecValues();
+			} else{ entry = getWaterValues(); }
+			table_entry = getTableEntry(entry);
+		} catch(Exception e){}
 
-	public void doAction(String action, String[] entry, String[] table_entry, DataModel model, DefaultTableModel tableModel, ArrayList<String[]> data, int row, int id){
 		switch(action){
-
 			case "add":
 				model.add(entry);
 				tableModel.addRow(table_entry);
@@ -193,51 +211,46 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 		}
 	}
 
-
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 		String actioncommand = ae.getActionCommand();
-
+		if(actioncommand.startsWith("Add") || actioncommand.startsWith("Edit")){
+			try { Integer.parseInt(input.getText());
+			} catch (Exception e) {
+				JOptionPane.showMessageDialog(null, "Enter valid " + unit);
+				return;
+			}
+		}
 		switch(actioncommand){
-			case "Cancel":
+			case "Delete Water":
+				doAction("delete", "water", sbw.mw.w_model, sbw.w_tableModel, sbw.w_data, sbw.w_row, sbw.e_id);
 				break;
 
-			case "Delete":
-				doAction("delete", null, null, sbw.mw.w_model, sbw.w_tableModel, sbw.w_data, sbw.w_row, sbw.e_id);
+			case "Delete Elec":
+				doAction("delete", "elec", sbw.mw.e_model, sbw.e_tableModel, sbw.e_data, sbw.e_row, sbw.w_id);
 				break;
 
-			case " Delete ":
-				doAction("delete", null, null, sbw.mw.e_model, sbw.e_tableModel, sbw.e_data, sbw.e_row, sbw.w_id);
+			case "Add Water":
+				sbw.w_id = sbw.mw.w_model.getNextRowNum();
+				doAction("add", "water", sbw.mw.w_model, sbw.w_tableModel, sbw.w_data, sbw.w_row, sbw.w_id);
 				break;
 
-			default:
-				try { Integer.parseInt(input.getText());
-				} catch (Exception e) {
-					JOptionPane.showMessageDialog(null, "Enter valid " + unit);
-					return;}
+			case "Edit Water":
+				sbw.w_id = Integer.parseInt(sbw.w_data.get(sbw.w_row)[0]);
+				doAction("edit", "water", sbw.mw.w_model, sbw.w_tableModel,  sbw.w_data, sbw.w_row, sbw.w_id);
+				break;
 
-				if(elec) {
-					if(add){ sbw.e_id = sbw.mw.e_model.getNextRowNum();
-					} else  sbw.e_id = Integer.parseInt(sbw.e_data.get(sbw.e_row)[0]);
+			case "Add Elec":
+				sbw.e_id = sbw.mw.e_model.getNextRowNum();
+				doAction("add",  "elec", sbw.mw.e_model, sbw.e_tableModel, sbw.e_data, sbw.e_row, sbw.e_id);
+				break;
 
-					entry = getElecValues();
-					tableEntry = getTableEntry(entry);
-
-					doAction(action, entry, tableEntry, sbw.mw.e_model, sbw.e_tableModel, sbw.e_data, sbw.e_row, sbw.e_id);
-
-				} else {
-					if(add){ sbw.w_id = sbw.mw.w_model.getNextRowNum();
-					} else  sbw.w_id = Integer.parseInt(sbw.w_data.get(sbw.w_row)[0]);
-
-					entry = getWaterValues();
-					tableEntry = getTableEntry(entry);
-
-					doAction(action, entry, tableEntry, sbw.mw.w_model, sbw.w_tableModel,  sbw.w_data, sbw.w_row, sbw.w_id);
-				}
-
-				sbw.revalidate();
+			case "Edit Elec":
+				sbw.e_id = Integer.parseInt(sbw.e_data.get(sbw.e_row)[0]);
+				doAction("edit", "elec", sbw.mw.e_model, sbw.e_tableModel, sbw.e_data, sbw.e_row, sbw.e_id);
 				break;
 		}
+		sbw.revalidate();
 		f.dispose();
 	}
 

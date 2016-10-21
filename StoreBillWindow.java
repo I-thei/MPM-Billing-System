@@ -173,26 +173,30 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		generate.setBounds(padding + compPadding + compWidth, HEIGHT - padding * 2 - compHeight, compWidth, compHeight);
 		add(generate);
 
-		e_add = new JButton(" Add ");
+		e_add = new JButton("Add");
 		e_add.setBounds(WIDTH - padding + compPadding / 2 - buttonWidth, e_table_y, buttonWidth - 10, compHeight);
 		e_add.addActionListener(this);
+		e_add.setActionCommand("Add Elec");
 		add(e_add);
 
-		e_delete = new JButton(" Delete ");
+		e_delete = new JButton("Delete");
 		e_delete.setBounds(WIDTH - padding + compPadding / 2 - buttonWidth, e_table_y + compHeight + compPadding , buttonWidth - 10, compHeight);
 		e_delete.addActionListener(this);
 		e_delete.setEnabled(false);
+		e_delete.setActionCommand("Delete Elec");
 		add(e_delete);
 
 		w_add = new JButton("Add");
 		w_add.setBounds(WIDTH - padding + compPadding / 2 - buttonWidth, w_table_y, buttonWidth - 10, compHeight);
 		w_add.addActionListener(this);
+		w_add.setActionCommand("Add Water");
 		add(w_add);
 
 		w_delete = new JButton("Delete");
 		w_delete.setBounds(WIDTH - padding + compPadding / 2 - buttonWidth, w_table_y + compHeight + compPadding , buttonWidth - 10, compHeight);
 		w_delete.addActionListener(this);
 		w_delete.setEnabled(false);
+		w_delete.setActionCommand("Delete Water");
 		add(w_delete);
 
 		for(String[] e : mw.e_data){
@@ -227,7 +231,7 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 	}
 
 	public void deleteSelectedRows(JTable table, DefaultTableModel tableModel, DataModel model, ArrayList<String[]> data){
-		int[] selected = e_table.getSelectedRows();
+		int[] selected = table.getSelectedRows();
 		int row = selected[0];
 		for (int i : selected) {
 			model.remove(Integer.parseInt(data.remove(row)[0]));
@@ -237,21 +241,20 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals(" Add ")) {
+		if (e.getActionCommand().equals("Add Elec")) {
 			new AddOrEditBillWindow(this, true, "add", null).input.requestFocus();
 
-		} else if (e.getActionCommand().equals("Add")) {
+		} else if (e.getActionCommand().equals("Add Water")) {
 			new AddOrEditBillWindow(this, false, "add", null).input.requestFocus();
 		
-		} else if (e.getActionCommand().equals(" Delete ")) {
+		} else if (e.getActionCommand().equals("Delete Elec")) {
 			deleteSelectedRows(e_table, e_tableModel, mw.e_model, e_data);
 			e_delete.setEnabled(false);
 
-		} else if (e.getActionCommand().equals("Delete")) {
+		} else if (e.getActionCommand().equals("Delete Water")) {
 			deleteSelectedRows(w_table, w_tableModel, mw.w_model, w_data);
 			w_delete.setEnabled(false);
 		}
-
 
 		revalidate();
 		updateUI();
