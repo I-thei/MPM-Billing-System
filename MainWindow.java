@@ -188,7 +188,7 @@ public class MainWindow extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equalsIgnoreCase("Add Store")) {
-			new AddStoreWindow(this, lastId);
+			new AddStoreWindow(this, lastId).nametf.requestFocus();
 		} else if (e.getActionCommand().equalsIgnoreCase("Settings")) {
 			new SettingsWindow(this);
 		} else if (e.getSource().getClass().toString().equals("class javax.swing.JTextField")) {

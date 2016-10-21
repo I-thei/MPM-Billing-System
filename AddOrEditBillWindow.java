@@ -2,6 +2,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Properties;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -9,10 +10,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
+
 
 @SuppressWarnings("serial")
 public class AddOrEditBillWindow extends JPanel implements ActionListener {
@@ -26,8 +29,9 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 	boolean elec, add;
 
 	String unit = "";
+	String action;
 	String[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September","October", "November", "December" };
-
+	String[] entry, tableEntry;
 	JLabel date_l, kW_or_cm_l;
 
 	JFrame f;
@@ -47,6 +51,7 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 
 		this.sbw = sbw;
 		this.elec = elec;
+		this.action = action;
 
 		String addoredit = "";
 		String isDelete = "Cancel";
@@ -58,8 +63,8 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 				break;
 			case "edit":
 				addoredit = "Set";
-				if(elec) {isDelete = "Delete";}
-					else {isDelete = " Delete ";}
+				if(elec) {isDelete = " Delete ";}
+					else {isDelete = "Delete";}
 				break;
 		}
 
@@ -123,69 +128,30 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 		datePicker.getJFormattedTextField().setText(months[Integer.parseInt(dateComp[1])] + " " + dateComp[2] + ", " + dateComp[0]);
 	}
 
-	@Override
-	public void actionPerformed(ActionEvent ae) { //will fix this pa
-		if (ae.getActionCommand().equalsIgnoreCase("Cancel")) {
-			f.dispose();
+	public String[] getTableEntry(String[] entry){
+		return new String[] {entry[0], entry[2], entry[3], entry[entry.length - 1]};
+	}
 
-		} else if (ae.getActionCommand().equalsIgnoreCase(" Delete ")){
-				sbw.mw.w_model.remove(Integer.parseInt(sbw.w_data.remove(sbw.w_row)[0]));
-				sbw.w_tableModel.removeRow(sbw.w_row);
+	public String[] getElecValues(){
+		return new String[]{
+			Integer.toString(sbw.e_id), 
+			sbw.store_id, 
+			datePicker.getJFormattedTextField().getText(), 
+			input.getText(), 
+			Double.toString(sbw.mw.e_kwh), 
+			getElectricityAmount()};
+	}
 
-		} else if (ae.getActionCommand().equalsIgnoreCase("Delete")){
-				sbw.mw.e_model.remove(Integer.parseInt(sbw.e_data.remove(sbw.e_row)[0]));
-				sbw.e_tableModel.removeRow(sbw.e_row);
-
-		} else {
-
-			try { Integer.parseInt(input.getText());
-			} catch (Exception e) {
-				JOptionPane.showMessageDialog(null, "Enter valid " + unit);
-				return;
-			}
-			if (elec) {
-				String[] e_entry = {Integer.toString(sbw.e_id), sbw.store_id, datePicker.getJFormattedTextField().getText(), input.getText(), Double.toString(sbw.mw.e_kwh), getElectricityAmount()};
-				String[] entry = {e_entry[0],e_entry[2], e_entry[3], e_entry[5]};
-				
-				if(add){
-					sbw.mw.e_model.add(e_entry);
-					sbw.e_tableModel.addRow(entry);
-					sbw.e_data.add(e_entry);
-					sbw.e_id ++;
-
-				} else {
-					sbw.e_id = Integer.parseInt(sbw.e_data.get(sbw.e_row)[0]);
-					e_entry = new String[]{Integer.toString(sbw.e_id), sbw.store_id, datePicker.getJFormattedTextField().getText(), input.getText(), Double.toString(sbw.mw.e_kwh), getElectricityAmount()};
-					entry = new String[]{e_entry[0],e_entry[2], e_entry[3], e_entry[5]};
-					sbw.mw.e_model.edit(sbw.e_id, e_entry);
-					sbw.e_tableModel.setValueAt(entry[1], sbw.e_row, 1);
-					sbw.e_tableModel.setValueAt(entry[2], sbw.e_row, 2);
-					sbw.e_tableModel.setValueAt(entry[3], sbw.e_row, 3);
-					sbw.e_data.set(sbw.e_row, e_entry);
-				}
-			} else {
-				String[] w_entry = {Integer.toString(sbw.w_id), sbw.store_id, datePicker.getJFormattedTextField().getText(), input.getText(), Double.toString(sbw.mw.w_firstTenCubic), Double.toString(sbw.mw.w_remainingCubic), Double.toString(sbw.mw.w_echarge), Double.toString(sbw.mw.w_evat), Double.toString(sbw.mw.w_maintenancecharge), getWaterAmount()};
-				String[] entry = {w_entry[0],w_entry[2], w_entry[3], w_entry[9]};
-
-				if(add){
-					sbw.mw.w_model.add(w_entry);
-					sbw.w_tableModel.addRow(entry);
-					sbw.w_data.add(w_entry);
-					sbw.w_id ++;
-				} else {
-					w_entry = new String[]{Integer.toString(sbw.w_id), sbw.store_id, datePicker.getJFormattedTextField().getText(), input.getText(), Double.toString(sbw.mw.w_firstTenCubic), Double.toString(sbw.mw.w_remainingCubic), Double.toString(sbw.mw.w_echarge), Double.toString(sbw.mw.w_evat), Double.toString(sbw.mw.w_maintenancecharge), getWaterAmount()};
-					entry = new String[]{w_entry[0],w_entry[2], w_entry[3], w_entry[9]};
-					sbw.w_id = Integer.parseInt(sbw.w_data.get(sbw.w_row)[0]);
-					sbw.mw.w_model.edit(sbw.w_id, w_entry);
-					sbw.w_tableModel.setValueAt(entry[1], sbw.w_row, 1);
-					sbw.w_tableModel.setValueAt(entry[2], sbw.w_row, 2);
-					sbw.w_tableModel.setValueAt(entry[3], sbw.w_row, 3);
-					sbw.w_data.set(sbw.w_row, w_entry);
-				}
-			}
-			sbw.revalidate();
-		}
-		f.dispose();
+	public String[] getWaterValues(){
+		return new String[] {
+			Integer.toString(sbw.w_id), 
+			sbw.store_id, datePicker.getJFormattedTextField().getText(), 
+			input.getText(), Double.toString(sbw.mw.w_firstTenCubic), 
+			Double.toString(sbw.mw.w_remainingCubic), 
+			Double.toString(sbw.mw.w_echarge), 
+			Double.toString(sbw.mw.w_evat), 
+			Double.toString(sbw.mw.w_maintenancecharge), 
+			getWaterAmount()};
 	}
 
 	public String getElectricityAmount() {
@@ -196,10 +162,83 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
  	public String getWaterAmount() {
  		Double cubicm = Double.parseDouble(input.getText());
  		Double amount = sbw.mw.w_firstTenCubic;
+
  		if (cubicm > 10) amount += (cubicm - 10) * sbw.mw.w_remainingCubic;
  		amount += amount * (sbw.mw.w_echarge / 100) + sbw.mw.w_maintenancecharge;
  		amount += amount * (sbw.mw.w_evat / 100);
+
  		return String.format("%.2f", amount);
  	}
+
+
+	public void doAction(String action, String[] entry, String[] table_entry, DataModel model, DefaultTableModel tableModel, ArrayList<String[]> data, int row, int id){
+		switch(action){
+
+			case "add":
+				model.add(entry);
+				tableModel.addRow(table_entry);
+				data.add(entry);
+				break;
+
+			case "edit":
+				model.edit(id, entry);
+				for(int i = 1; i <= 3; i++){ tableModel.setValueAt(table_entry[i], row, i);}
+				data.set(row,entry);
+				break;
+
+			case "delete":
+				model.remove(Integer.parseInt(data.remove(row)[0]));
+				tableModel.removeRow(row);
+				break;
+		}
+	}
+
+
+	@Override
+	public void actionPerformed(ActionEvent ae) {
+		String actioncommand = ae.getActionCommand();
+
+		switch(actioncommand){
+			case "Cancel":
+				break;
+
+			case "Delete":
+				doAction("delete", null, null, sbw.mw.w_model, sbw.w_tableModel, sbw.w_data, sbw.w_row, sbw.e_id);
+				break;
+
+			case " Delete ":
+				doAction("delete", null, null, sbw.mw.e_model, sbw.e_tableModel, sbw.e_data, sbw.e_row, sbw.w_id);
+				break;
+
+			default:
+				try { Integer.parseInt(input.getText());
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(null, "Enter valid " + unit);
+					return;}
+
+				if(elec) {
+					if(add){ sbw.e_id = sbw.mw.e_model.getNextRowNum();
+					} else  sbw.e_id = Integer.parseInt(sbw.e_data.get(sbw.e_row)[0]);
+
+					entry = getElecValues();
+					tableEntry = getTableEntry(entry);
+
+					doAction(action, entry, tableEntry, sbw.mw.e_model, sbw.e_tableModel, sbw.e_data, sbw.e_row, sbw.e_id);
+
+				} else {
+					if(add){ sbw.w_id = sbw.mw.w_model.getNextRowNum();
+					} else  sbw.w_id = Integer.parseInt(sbw.w_data.get(sbw.w_row)[0]);
+
+					entry = getWaterValues();
+					tableEntry = getTableEntry(entry);
+
+					doAction(action, entry, tableEntry, sbw.mw.w_model, sbw.w_tableModel,  sbw.w_data, sbw.w_row, sbw.w_id);
+				}
+
+				sbw.revalidate();
+				break;
+		}
+		f.dispose();
+	}
 
 }

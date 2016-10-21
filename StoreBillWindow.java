@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import javax.swing.*;
@@ -146,7 +147,7 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 			public void mousePressed(MouseEvent me) {
 				JTable table = (JTable) me.getSource();
 				Point p = me.getPoint();
-				w_row = table.rowAtPoint(p);;
+				w_row = table.rowAtPoint(p);
 				if(me.getClickCount() == 2 && w_row != -1) createEditWindow(w_data, w_row, "water");
 				w_delete.setEnabled(true);
 			}
@@ -183,12 +184,10 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		e_delete.setEnabled(false);
 		add(e_delete);
 
-
 		w_add = new JButton("Add");
 		w_add.setBounds(WIDTH - padding + compPadding / 2 - buttonWidth, w_table_y, buttonWidth - 10, compHeight);
 		w_add.addActionListener(this);
 		add(w_add);
-
 
 		w_delete = new JButton("Delete");
 		w_delete.setBounds(WIDTH - padding + compPadding / 2 - buttonWidth, w_table_y + compHeight + compPadding , buttonWidth - 10, compHeight);
@@ -212,7 +211,7 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 		e_data  = new ArrayList<>();
 		for(String[] e : mw.e_data) if(e[1].equals(store_id)) e_data.add(e);
-		
+
 		w_data = new ArrayList<>();
 		for(String[] w : mw.w_data) if(w[1].equals(store_id))w_data.add(w);
 		
@@ -221,38 +220,38 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		f.setVisible(true);
 	}
 
-	public AddOrEditBillWindow createEditWindow(ArrayList<String[]> data, int row, String s){
+	public void createEditWindow(ArrayList<String[]> data, int row, String s){
 		boolean bool = false;
 		if (s.equals("elec")){bool = true;}
-		return new AddOrEditBillWindow(this, bool, "edit", data.get(row));
+			new AddOrEditBillWindow(this, bool, "edit", data.get(row)).input.requestFocus();
 	}
 
+	public void deleteSelectedRows(JTable table, DefaultTableModel tableModel, DataModel model, ArrayList<String[]> data){
+		int[] selected = e_table.getSelectedRows();
+		int row = selected[0];
+		for (int i : selected) {
+			model.remove(Integer.parseInt(data.remove(row)[0]));
+			tableModel.removeRow(row);
+		}
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
 		if (e.getActionCommand().equals(" Add ")) {
-			new AddOrEditBillWindow(this, true, "add", null);
+			new AddOrEditBillWindow(this, true, "add", null).input.requestFocus();
 
 		} else if (e.getActionCommand().equals("Add")) {
-			new AddOrEditBillWindow(this, false, "add", null);
+			new AddOrEditBillWindow(this, false, "add", null).input.requestFocus();
 		
 		} else if (e.getActionCommand().equals(" Delete ")) {
-			int[] selected = e_table.getSelectedRows();
-			for (int i : selected) {
-				mw.e_model.remove(Integer.parseInt(e_data.remove(e_row)[0]));
-				e_tableModel.removeRow(e_row);
-			}
+			deleteSelectedRows(e_table, e_tableModel, mw.e_model, e_data);
 			e_delete.setEnabled(false);
 
 		} else if (e.getActionCommand().equals("Delete")) {
-			int[] selected = w_table.getSelectedRows();
-			for (int i : selected) {
-				mw.w_model.remove(Integer.parseInt(w_data.remove(w_row)[0]));
-				w_tableModel.removeRow(w_row);
-			}
+			deleteSelectedRows(w_table, w_tableModel, mw.w_model, w_data);
 			w_delete.setEnabled(false);
 		}
+
 
 		revalidate();
 		updateUI();
