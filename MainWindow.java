@@ -211,7 +211,7 @@ public class MainWindow extends JPanel implements ActionListener {
 
 	public void search(String search_item){
 		ArrayList<String[]> temp_data = new ArrayList<String[]>();
-		for(String[] d : data) if(d[2].toLowerCase().startsWith(search_item.toLowerCase())) temp_data.add(d);
+		for(String[] d : data) if(d[2].toLowerCase().contains(search_item.toLowerCase())) temp_data.add(d);
 		updateTable(temp_data);
 		revalidate();
 	}

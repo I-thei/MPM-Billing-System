@@ -89,10 +89,9 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 				addoredit = "Set";
 				isDelete = "Delete";
 				cancel_delete_command = "Delete " + type;
-				add_edit_command = "Edit " + type;
+				add_edit_command = "Edit" + type;
 				break;
 		}
-
 
 		f = new JFrame(add_edit_command + " Bill");
 		f.setSize(WIDTH, HEIGHT);
@@ -127,7 +126,7 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 		add_or_edit = new JButton(addoredit);
 		add_or_edit.setBounds(padding, HEIGHT - padding * 2 - compHeight - compPadding, 80, compHeight);
 		add_or_edit.addActionListener(this);
-		add_or_edit.setActionCommand(add_edit_command);
+		add_or_edit.setActionCommand(type);
 
 		cancel = new JButton(isDelete);
 		cancel.setBounds(WIDTH - padding - 80 - compPadding, HEIGHT - padding * 2 - compHeight - compPadding, 80, compHeight);
@@ -228,7 +227,7 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 		String actioncommand = ae.getActionCommand();
-		if(actioncommand.startsWith("Add") || actioncommand.startsWith("Edit")){
+		if(actioncommand.startsWith("W") || actioncommand.startsWith("E")){
 			try { Integer.parseInt(input.getText());
 			} catch (Exception e) {
 				JOptionPane.showMessageDialog(null, "Enter valid " + unit);
@@ -246,21 +245,14 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 				sbw.e_delete.setEnabled(false);
 				break;
 
-			case "Add Water":
-				doAction("add", "water");
+			case "Water":
+				doAction(action, "water");
 				break;
 
-			case "Edit Water":
-				doAction("edit", "water");
+			case "Elec":
+				doAction(action,  "elec");
 				break;
 
-			case "Add Elec":
-				doAction("add",  "elec");
-				break;
-
-			case "Edit Elec":
-				doAction("edit", "elec");
-				break;
 		}
 		sbw.revalidate();
 		f.dispose();
