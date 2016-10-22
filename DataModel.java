@@ -10,7 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public enum DataModel {
   Stores(new String[]{"ID", "Section", "Name", "Holder"}),
-  Electric(new String[]{"ID", "Store ID", "Date", "kWh", "Rate", "Amount"}),
+  Electric(new String[]{"ID", "Store ID", "Date", "kWh", "Reading", "Rate", "Amount"}),
   Water(new String[]{"ID", "Store ID", "Date", "Cubic meters", "Rate: First 10", "Rate: Remaining Cubic", "Environmental Charge", "E-Vat", "Maintenance Charge", "Amount"});
 
 
@@ -135,7 +135,6 @@ public enum DataModel {
   }
 
   public boolean remove(int id) {
-    if (name() == "Stores") return false;
     int _id = Integer.parseInt(data.remove(dataIndex(id))[0]);
     return _edit(_id, new String[]{"-1"});
   }

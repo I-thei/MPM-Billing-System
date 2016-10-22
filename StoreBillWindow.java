@@ -50,7 +50,7 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 	JFrame f;
 
-	JButton generate, e_add, e_delete, w_add, w_delete;
+	JButton generate, e_add, e_delete, w_add, w_delete, s_edit;
 	JButton[] e_buttons = new JButton[3];
 	JButton[] w_buttons = new JButton[3];
 
@@ -68,8 +68,8 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		this.mw = mw;
 
 		store_id = store_data[0];
-		store_name = store_data[1];
-		store_section = store_data[2];
+		store_name = store_data[2];
+		store_section = store_data[1];
 		store_holder = store_data[3];
 
 		f = new JFrame(store_name + " Electricity And Water Bills");
@@ -169,6 +169,12 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		generate.setBounds(padding + compPadding + compWidth, HEIGHT - padding * 2 - compHeight, compWidth, compHeight);
 		add(generate);
 
+		s_edit = new JButton("Edit Store");
+		s_edit.setBounds(padding + compPadding*2 + compWidth*2, HEIGHT - padding * 2 - compHeight, compWidth - padding*2, compHeight);
+		s_edit.addActionListener(this);
+		add(s_edit);
+
+
 		e_add = new JButton("Add");
 		e_add.setBounds(WIDTH - padding + compPadding / 2 - buttonWidth, e_table_y, buttonWidth - 10, compHeight);
 		e_add.addActionListener(this);
@@ -199,7 +205,7 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 		for(String[] e : mw.e_data){
 			if (e[1].equals(store_id)){
 					e_data.add(e);
-					String[] entry = {e[0], e[2], e[3], e[5]};
+					String[] entry = {e[0], e[2], e[3], e[6]};
 					e_tableModel.addRow(entry);
 			}
 		}
@@ -234,20 +240,39 @@ public class StoreBillWindow extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getActionCommand().equals("Add Elec")) {
-			new AddOrEditBillWindow(this, true, "add", null).input.requestFocus();
+		String action = e.getActionCommand();
 
-		} else if (e.getActionCommand().equals("Add Water")) {
+		switch(action){
+			case "Add Elec":
+			new AddOrEditBillWindow(this, true, "add", null).input.requestFocus();
+			break;
+
+			case "Add Water":
 			new AddOrEditBillWindow(this, false, "add", null).input.requestFocus();
-		
-		} else if (e.getActionCommand().equals("Delete Elec")) {
+			break;
+			
+			case "Delete Elec":
 			deleteSelectedRows(e_table, e_tableModel, mw.e_model, e_data);
 			e_delete.setEnabled(false);
+			break;
 
-		} else if (e.getActionCommand().equals("Delete Water")) {
+			case "Delete Water":
 			deleteSelectedRows(w_table, w_tableModel, mw.w_model, w_data);
 			w_delete.setEnabled(false);
+			break;
+
+			case "Edit Store":
+			AddStoreWindow asw = new AddStoreWindow(mw, this, Integer.parseInt(store_id));
+			asw.sectionsircb.setSelectedItem(store_section);
+			asw.nametf.setText(store_name);
+			asw.nametf.requestFocus();
+			asw.holdertf.setText(store_holder);
+			asw.f.setTitle("Edit Store");
+			asw.add.setText("Set");
+			asw.cancel.setText("Delete");
 		}
+		
+
 
 		revalidate();
 		updateUI();

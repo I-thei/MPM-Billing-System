@@ -19,7 +19,7 @@ import org.jdatepicker.impl.UtilDateModel;
 
 @SuppressWarnings("serial")
 public class AddOrEditBillWindow extends JPanel implements ActionListener {
-
+	int initial;
 	int padding = 25;
 	int compPadding = 10;
 	int compHeight = 25;
@@ -63,7 +63,7 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 
 		if(elec){ 
 			type = "Elec";
-			unit = "kW";
+			unit = "Reading kW";
 			this.model = sbw.mw.e_model;
 			this.tableModel = sbw.e_tableModel;
 			this.data = sbw.e_data;
@@ -92,6 +92,8 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 				add_edit_command = "Edit" + type;
 				break;
 		}
+
+		this.initial = setInitial();
 
 		f = new JFrame(add_edit_command + " Bill");
 		f.setSize(WIDTH, HEIGHT);
@@ -157,13 +159,29 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 	}
 
 	public String[] getElecValues(){
+		int in = Integer.parseInt(input.getText());
 		return new String[]{
 			Integer.toString(id), 
 			sbw.store_id, 
 			datePicker.getJFormattedTextField().getText(), 
-			input.getText(), 
+			Integer.toString(in - initial), 
+			input.getText(),
 			Double.toString(sbw.mw.e_kwh), 
 			getElectricityAmount()};
+	}
+
+	public int setInitial(){
+		int out = 0;
+		if(elec && data != null){
+			for( String[] d : data) {
+				if(Integer.parseInt(d[4]) > 0) {
+					out = Integer.parseInt(d[4]);
+				} else {
+					out = 0;
+				}
+			}
+		}
+		return out;
 	}
 
 	public String[] getWaterValues(){
@@ -179,7 +197,10 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 	}
 
 	public String getElectricityAmount() {
-  		Double amount = Double.parseDouble(input.getText()) * sbw.mw.e_kwh;
+		int in = Integer.parseInt(input.getText());
+  		Double amount = (in - initial) * sbw.mw.e_kwh;
+		setInitial();
+
  		return String.format("%.2f", amount);
  	}
  
@@ -239,7 +260,7 @@ public class AddOrEditBillWindow extends JPanel implements ActionListener {
 				doAction("delete", "water");
 				sbw.w_delete.setEnabled(false);
 				break;
-				
+
 			case "Delete Elec":
 				doAction("delete", "elec");
 				sbw.e_delete.setEnabled(false);

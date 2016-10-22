@@ -35,12 +35,14 @@ public class AddStoreWindow extends JPanel implements ActionListener {
 	JFrame f;
 
 	MainWindow mw;
+	StoreBillWindow sbw;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public AddStoreWindow(MainWindow mw, int store_id) {
+	public AddStoreWindow(MainWindow mw, StoreBillWindow sbw, int store_id) {
 
 		this.store_id = store_id;
 		this.mw = mw;
+		this.sbw = sbw;
 
 		this.setLayout(null);
 		this.setSize(new Dimension(WIDTH, HEIGHT));
@@ -99,18 +101,51 @@ public class AddStoreWindow extends JPanel implements ActionListener {
 		f.setVisible(true);
 	}
 
+	public int indexStoreID(int id){
+		int i = 0;
+		if(mw.data != null){
+			while(i < mw.data.size() - 1 && Integer.parseInt(mw.data.get(i)[0]) != id ){
+				i++;
+			}
+		}
+		return i;
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		if (ae.getActionCommand().equalsIgnoreCase("Add")) {
-			String selected_section = String.valueOf(sectionsircb.getSelectedItem());
-			if(!sectionl.equals("ALL SECTIONS")) mw.sections.setSelectedItem(selected_section);
+		String selected_section = String.valueOf(sectionsircb.getSelectedItem());
+		String action = ae.getActionCommand();
+		int row = indexStoreID(store_id); 
 
-			String[] entry = {Integer.toString(store_id), selected_section, nametf.getText(), holdertf.getText()};
-			mw.model.add(entry);
-			mw.tableModel.addRow(entry);
-			mw.lastId++;
-			mw.revalidate();	
-		}
+		switch(action) {
+			case "Add":
+				if(!sectionl.equals("ALL SECTIONS")) mw.sections.setSelectedItem(selected_section);
+				String[] new_entry = {Integer.toString(store_id), selected_section, nametf.getText(), holdertf.getText()};
+				mw.model.add(new_entry);
+				mw.tableModel.addRow(new_entry);
+				mw.lastId++;
+				mw.revalidate();	
+				break;
+
+			case "Delete":
+				mw.model.remove(store_id);
+				mw.tableModel.removeRow(row);
+				sbw.f.dispose();
+				break;
+			
+			case "Set":
+				String[] entry = {Integer.toString(store_id), selected_section, nametf.getText(), holdertf.getText()};
+				mw.model.edit(store_id, entry);
+				for(int i = 1; i <= 3; i++){ 
+					mw.tableModel.setValueAt(entry[i], row, i);		
+				}
+				mw.data.set(row,entry);
+				sbw.sectionl.setText("Section: " + selected_section);
+				sbw.namel.setText("Store: " + nametf.getText());
+				sbw.holderl.setText("Holder: " + holdertf.getText());
+				sbw.revalidate();
+			}
+		mw.revalidate();
 		f.dispose();
 	}
 
